@@ -1,0 +1,31 @@
+:root { --brand: #212529; --accent: #d9480f; }
+body { background: #f6f7f9; }
+body.customer { -webkit-tap-highlight-color: transparent; }
+
+.cust-header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: .6rem 0; z-index: 10; }
+.cat-tabs { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .25rem; }
+.cat-tabs .btn { white-space: nowrap; border-radius: 999px; }
+
+.menu-card { border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+.menu-img { width: 104px; min-height: 104px; object-fit: cover; background: #e9ecef; flex-shrink: 0; }
+
+.qty-control { display: inline-flex; align-items: center; gap: .5rem; }
+.qty-num { min-width: 1.5rem; text-align: center; font-weight: 600; }
+.btn-qty { width: 40px; height: 40px; padding: 0; font-size: 1.25rem; line-height: 1; border-radius: 50%; }
+
+.has-cartbar { padding-bottom: 5.5rem !important; }
+.cart-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: space-between;
+  align-items: center; gap: 1rem; padding: 1rem 1.25rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  background: var(--brand); color: #fff; text-decoration: none; }
+.cart-bar:hover { color: #fff; }
+.cart-bar .btn { min-height: 48px; }
+
+.success-icon { width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; background: #198754; color: #fff;
+  font-size: 2.5rem; line-height: 80px; }
+
+/* admin */
+.login-wrap { padding-top: 12vh; }
+.order-card { border-width: 2px; }
+.note-box { background: #fff3cd; border-radius: .5rem; padding: .5rem .75rem; }
+.order-card .btn-lg { min-height: 52px; }
+.qr-holder canvas { width: 100%; max-width: 220px; height: auto; }
