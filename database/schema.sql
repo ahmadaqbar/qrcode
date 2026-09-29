@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS orders (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   order_number VARCHAR(20) NOT NULL UNIQUE,  -- ORD-000001
   order_token CHAR(32) NOT NULL UNIQUE,      -- kunci idempotensi + akses halaman sukses
+  client_ip VARCHAR(45) NULL,                -- untuk pembatasan jumlah order
   table_id INT UNSIGNED NOT NULL,
   customer_name VARCHAR(100) NULL,
   note VARCHAR(500) NULL,
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   KEY idx_orders_status_created (status, created_at),
   KEY idx_orders_table (table_id),
+  KEY idx_orders_ip_created (client_ip, created_at),
   CONSTRAINT fk_orders_table FOREIGN KEY (table_id) REFERENCES tables (id)
 ) ENGINE=InnoDB;
 
@@ -68,6 +70,13 @@ CREATE TABLE IF NOT EXISTS order_items (
   KEY idx_items_product (product_id),
   CONSTRAINT fk_items_order FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
   CONSTRAINT fk_items_product FOREIGN KEY (product_id) REFERENCES products (id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS login_attempts (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ip VARCHAR(45) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_login_ip_created (ip, created_at)
 ) ENGINE=InnoDB;
 
 -- ===== Data contoh =====

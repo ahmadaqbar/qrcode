@@ -186,3 +186,40 @@ function csrf_valid(): bool
         : (isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '');
     return !empty($_SESSION['csrf']) && is_string($sent) && hash_equals($_SESSION['csrf'], $sent);
 }
+
+/* ---------- Tahap 2: util tambahan ---------- */
+
+/** IP client (sengaja hanya REMOTE_ADDR: header proxy bisa dipalsukan). */
+function client_ip(): string
+{
+    return isset($_SERVER['REMOTE_ADDR']) ? substr($_SERVER['REMOTE_ADDR'], 0, 45) : '0.0.0.0';
+}
+
+function flash_set(string $type, string $msg): void
+{
+    start_session();
+    $_SESSION['flash'] = ['type' => $type, 'msg' => $msg];
+}
+
+/** Ambil & hapus pesan flash: ['type'=>..,'msg'=>..] atau null. */
+function flash_get(): ?array
+{
+    start_session();
+    $f = isset($_SESSION['flash']) ? $_SESSION['flash'] : null;
+    unset($_SESSION['flash']);
+    return $f;
+}
+
+/** Trim + buang karakter kontrol. Return '' bila kosong. */
+function clean_input($v, int $max = 255): string
+{
+    $v = is_string($v) ? trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $v)) : '';
+    return mb_substr($v, 0, $max, 'UTF-8');
+}
+
+/** Redirect + exit. */
+function redirect(string $url): void
+{
+    header('Location: ' . $url);
+    exit;
+}

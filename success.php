@@ -22,7 +22,7 @@ if (!$order) {
 $page_title = 'Pesanan Berhasil';
 $base = '';
 $page = 'success';
-$body_attrs = ['table' => $order['table_number']];
+$body_attrs = ['table' => $order['table_number'], 'token' => $token, 'status' => $order['status']];
 include __DIR__ . '/includes/header.php';
 ?>
 <main class="container py-5 text-center" style="max-width:480px">
@@ -35,9 +35,9 @@ include __DIR__ . '/includes/header.php';
     <div class="small text-muted">Meja</div>
     <div class="fw-semibold mb-2"><?= e($order['table_number']) ?></div>
     <div class="small text-muted">Status</div>
-    <div class="fw-semibold"><?= e(status_label($order['status'])) ?></div>
+    <div class="fw-semibold" id="order-status"><?= e(status_label($order['status'])) ?></div>
   </div></div>
-  <p class="mt-4">Mohon menunggu.</p>
+  <p class="mt-4" id="wait-msg">Mohon menunggu.</p>
   <a href="order.php?table=<?= e($order['table_number']) ?>" class="btn btn-outline-dark mt-2">Pesan Lagi</a>
 </main>
 <?php include __DIR__ . '/includes/footer.php'; ?>

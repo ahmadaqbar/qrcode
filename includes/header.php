@@ -20,13 +20,17 @@ $admin = !empty($admin);
 <body class="<?= $admin ? 'admin' : 'customer' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
 <?php foreach ($body_attrs as $k => $v): ?> data-<?= e($k) ?>="<?= e($v) ?>"<?php endforeach; ?>>
 <?php if ($admin && is_logged_in()): ?>
-<nav class="navbar navbar-expand navbar-dark bg-dark">
+<nav class="navbar navbar-expand navbar-dark bg-dark flex-wrap">
   <div class="container-fluid">
     <a class="navbar-brand fw-semibold" href="dashboard.php"><?= e(APP_NAME) ?></a>
-    <ul class="navbar-nav me-auto flex-row gap-3">
+    <ul class="navbar-nav me-auto flex-row flex-wrap gap-3">
       <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
       <li class="nav-item"><a class="nav-link" href="orders.php">Pesanan</a></li>
-      <li class="nav-item"><a class="nav-link" href="qr.php">QR Meja</a></li>
+      <li class="nav-item"><a class="nav-link" href="products.php">Menu</a></li>
+      <li class="nav-item"><a class="nav-link" href="categories.php">Kategori</a></li>
+      <li class="nav-item"><a class="nav-link" href="tables.php">Meja</a></li>
+      <li class="nav-item"><a class="nav-link" href="qr.php">QR</a></li>
+      <li class="nav-item"><a class="nav-link" href="account.php">Akun</a></li>
     </ul>
     <form method="post" action="logout.php" class="m-0">
       <?= csrf_field() ?>
@@ -34,4 +38,7 @@ $admin = !empty($admin);
     </form>
   </div>
 </nav>
+<?php endif; ?>
+<?php if ($admin && ($f = flash_get())): ?>
+<div class="container-fluid pt-3"><div class="alert alert-<?= $f['type'] === 'ok' ? 'success' : 'danger' ?> mb-0"><?= e($f['msg']) ?></div></div>
 <?php endif; ?>

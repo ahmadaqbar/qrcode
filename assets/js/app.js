@@ -256,6 +256,28 @@
     });
   }
 
+  /* ---------- Halaman: success (status pesanan live) ---------- */
+  function initSuccess() {
+    var token = body.getAttribute('data-token');
+    var msgs = { NEW: 'Mohon menunggu.', PROCESSING: 'Pesanan Anda sedang disiapkan.', COMPLETED: 'Pesanan selesai. Selamat menikmati!', CANCELLED: 'Pesanan dibatalkan. Silakan hubungi pelayan.' };
+    var last = body.getAttribute('data-status');
+    function tick() {
+      if (last === 'COMPLETED' || last === 'CANCELLED') return;
+      fetch(BASE + 'api/order-status.php?t=' + encodeURIComponent(token), { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.ok) {
+            last = j.status;
+            $('#order-status').textContent = j.status_label;
+            $('#wait-msg').textContent = msgs[j.status] || '';
+          }
+        })
+        .catch(function () { /* coba lagi di putaran berikut */ })
+        .then(function () { setTimeout(tick, 5000); });
+    }
+    setTimeout(tick, 5000);
+  }
+
   /* ---------- Halaman admin: QR ---------- */
   function initQr() {
     $all('.qr-holder').forEach(function (h) {
@@ -462,6 +484,6 @@
     poll();
   }
 
-  var inits = { menu: initMenu, cart: initCart, checkout: initCheckout, 'order-detail': initOrderDetail, qr: initQr, dashboard: initDashboard };
+  var inits = { menu: initMenu, cart: initCart, checkout: initCheckout, success: initSuccess, 'order-detail': initOrderDetail, qr: initQr, dashboard: initDashboard };
   if (inits[PAGE]) inits[PAGE]();
 })();

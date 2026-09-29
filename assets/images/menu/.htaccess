@@ -1,0 +1,4 @@
+# Folder upload: jangan pernah eksekusi script
+php_flag engine off
+RemoveHandler .php .phtml .php5
+Options -ExecCGI

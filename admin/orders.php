@@ -22,6 +22,16 @@ try {
     $dbError = true;
 }
 
+$today = ['n' => 0, 'done' => 0, 'revenue' => 0, 'open' => 0];
+try {
+    $r = db()->query("SELECT COUNT(*) n, SUM(status='COMPLETED') done, SUM(status IN ('NEW','PROCESSING')) open,
+                             COALESCE(SUM(CASE WHEN status='COMPLETED' THEN total END),0) revenue
+                      FROM orders WHERE created_at >= CURDATE()")->fetch();
+    $today = ['n' => (int) $r['n'], 'done' => (int) $r['done'], 'open' => (int) $r['open'], 'revenue' => (int) $r['revenue']];
+} catch (Throwable $ex) {
+    error_log($ex->getMessage());
+}
+
 $badge = ['NEW' => 'danger', 'PROCESSING' => 'warning', 'COMPLETED' => 'success', 'CANCELLED' => 'secondary'];
 $page_title = 'Pesanan';
 $base = '../';
@@ -30,6 +40,12 @@ include __DIR__ . '/../includes/header.php';
 ?>
 <div class="container-fluid py-3">
   <h1 class="h4 mb-3">Daftar Pesanan</h1>
+  <div class="row g-2 mb-3">
+    <?php foreach ([['Pesanan hari ini', $today['n']], ['Masih berjalan', $today['open']], ['Selesai', $today['done']], ['Omzet selesai', rupiah($today['revenue'])]] as $s): ?>
+      <div class="col-6 col-md-3"><div class="card"><div class="card-body py-2">
+        <div class="small text-muted"><?= e($s[0]) ?></div><div class="fs-5 fw-bold"><?= e($s[1]) ?></div></div></div></div>
+    <?php endforeach; ?>
+  </div>
   <div class="d-flex flex-wrap gap-2 mb-3">
     <?php foreach ($filters as $k => $label): ?>
       <a class="btn btn-sm <?= $f === $k ? 'btn-dark' : 'btn-outline-dark' ?>" href="orders.php?status=<?= e($k) ?>"><?= e($label) ?></a>

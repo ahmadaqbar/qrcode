@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
     if (!csrf_valid()) {
         $error = 'Sesi tidak valid, silakan coba lagi.';
+    } elseif (login_locked()) {
+        $error = 'Terlalu banyak percobaan login. Coba lagi dalam ' . LOGIN_WINDOW_MIN . ' menit.';
     } elseif ($username === '' || $password === '' || strlen($username) > 50) {
         $error = 'Username dan password wajib diisi.';
     } else {

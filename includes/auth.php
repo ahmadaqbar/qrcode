@@ -20,6 +20,16 @@ function require_login(bool $json = false): void
     exit;
 }
 
+const LOGIN_MAX_FAILS = 5;      // percobaan gagal
+const LOGIN_WINDOW_MIN = 10;    // dalam menit
+
+function login_locked(): bool
+{
+    $st = db()->prepare('SELECT COUNT(*) FROM login_attempts WHERE ip = ? AND created_at > (NOW() - INTERVAL ' . LOGIN_WINDOW_MIN . ' MINUTE)');
+    $st->execute([client_ip()]);
+    return (int) $st->fetchColumn() >= LOGIN_MAX_FAILS;
+}
+
 /** Verifikasi username+password. Return true bila sukses (session di-regenerate). */
 function attempt_login(string $username, string $password): bool
 {
@@ -29,9 +39,12 @@ function attempt_login(string $username, string $password): bool
     // password_verify tetap dijalankan walau user tidak ada (mengurangi timing leak)
     $hash = $u ? $u['password'] : '$2y$10$usesomesillystringforsalt.abcdefghijklmnopqrstuvwxyzABCD';
     if (!password_verify($password, $hash) || !$u) {
+        db()->prepare('INSERT INTO login_attempts (ip) VALUES (?)')->execute([client_ip()]);
         usleep(400000);
         return false;
     }
+    db()->prepare('DELETE FROM login_attempts WHERE ip = ?')->execute([client_ip()]);
+    db()->exec('DELETE FROM login_attempts WHERE created_at < (NOW() - INTERVAL 1 DAY)');
     start_session();
     session_regenerate_id(true);
     $_SESSION['user_id'] = (int) $u['id'];

@@ -73,6 +73,15 @@ try {
         json_response(['ok' => false, 'error' => 'Meja tidak valid.'], 422);
     }
 
+    // Anti-spam: maks 5 order/menit per IP dan maks 15 order NEW menumpuk per meja
+    $rl = $pdo->prepare('SELECT COUNT(*) FROM orders WHERE client_ip = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)');
+    $rl->execute([client_ip()]);
+    $rt = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE table_id = ? AND status = 'NEW'");
+    $rt->execute([$table['id']]);
+    if ((int) $rl->fetchColumn() >= 5 || (int) $rt->fetchColumn() >= 15) {
+        json_response(['ok' => false, 'error' => 'Terlalu banyak pesanan. Mohon tunggu sebentar atau panggil pelayan.'], 429);
+    }
+
     $ids = array_keys($qtyById);
     $in_sql = implode(',', array_fill(0, count($ids), '?'));
     $st = $pdo->prepare("SELECT p.id, p.name, p.price, p.is_available
@@ -100,9 +109,9 @@ try {
     $pdo->beginTransaction();
     try {
         // Nomor sementara, diganti ORD-xxxxxx dari id setelah insert
-        $pdo->prepare('INSERT INTO orders (order_number, order_token, table_id, customer_name, note, total, status)
-                       VALUES (?, ?, ?, ?, ?, ?, \'NEW\')')
-            ->execute(['T' . substr($token, 0, 15), $token, $table['id'], $name, $note, $total]);
+        $pdo->prepare('INSERT INTO orders (order_number, order_token, client_ip, table_id, customer_name, note, total, status)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, \'NEW\')')
+            ->execute(['T' . substr($token, 0, 15), $token, client_ip(), $table['id'], $name, $note, $total]);
         $orderId = (int) $pdo->lastInsertId();
         $number = sprintf('ORD-%06d', $orderId);
         $pdo->prepare('UPDATE orders SET order_number = ? WHERE id = ?')->execute([$number, $orderId]);
