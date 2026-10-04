@@ -5,7 +5,7 @@ Staff login → dashboard (polling 4 detik, popup + notifikasi browser + suara) 
 
 ## Setup
 1. `mysql -u root -p < database/schema.sql` (membuat DB `restaurant_ordering` + data contoh).
-   Upgrade dari versi lama (berurutan, masing-masing sekali): `database/migrations/002_security_and_admin.sql`, lalu `003_flyers_promos_topseller_settings.sql`
+   Upgrade dari versi lama (berurutan, masing-masing sekali): `database/migrations/002_security_and_admin.sql`, lalu `003_flyers_promos_topseller_settings.sql`, lalu `004_product_links_category_icons.sql`
 2. Kredensial DB via env (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`) atau buat `config/local.php`:
    ```php
    <?php return ['user' => 'app', 'pass' => 'rahasia'];
@@ -33,3 +33,10 @@ Notifikasi suara: klik **AKTIFKAN** sekali saat membuka dashboard (aturan autopl
 - **QR Code Management** (`/admin/qr.php`): Base URL disimpan di tabel `settings` (`site_url`); QR dibuat ulang otomatis. Validasi: hanya http/https, tanpa HTML/spasi/kutip/query/fragment, trailing slash dibuang.
 - Upload gambar (menu, flyer, promo): cek ekstensi + MIME + ukuran 2MB, nama acak; flyer/promo di `assets/uploads/`.
 - Navigasi admin berupa sidebar (offcanvas di HP).
+
+## Fitur tahap 4
+- **Sidebar admin collapsible**: tombol ☰ (desktop) mengecilkan sidebar jadi icon-only (animasi 0,3s, konten melebar); state di `localStorage` key `admin_sidebar_collapsed`. Di HP berupa off-canvas dengan overlay. URL menu tidak berubah.
+- **Promo & flyer terhubung produk** (`promos.product_id`, `flyers.product_id`, FK ke `products`): produk wajib dipilih (divalidasi server, preview nama/harga/status). Produk yang dipakai promo/flyer tidak bisa dihapus (ditandai Habis) sehingga relasi tidak rusak. Promo/flyer lama tanpa produk tetap tampil tapi tidak bisa diklik sampai diedit.
+- **Detail produk** (modal, bottom-sheet di HP): klik gambar/nama di menu & Top Seller, atau gambar promo/flyer. Prev/Next mengikuti daftar yang sedang tampil (menu terfilter / top seller), bisa di-swipe. Tombol **+ Tambah Pesanan** menambah qty (tanpa duplikat); produk Habis dinonaktifkan. Server tetap memvalidasi produk & harga saat order.
+- **Istilah "Keranjang" -> "Pesanan"** di seluruh tampilan customer (nama internal `cart` tidak diubah).
+- **Kategori ber-icon** (Bootstrap Icons lokal, whitelist; dipilih admin di Categories) dan dapat digeser horizontal.

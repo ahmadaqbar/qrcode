@@ -11,12 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : '';
     $id = filter_var(isset($_POST['id']) ? $_POST['id'] : null, FILTER_VALIDATE_INT);
     $name = clean_input(isset($_POST['name']) ? $_POST['name'] : '', 50);
+    $icon = category_icon(isset($_POST['icon']) ? $_POST['icon'] : '');   // whitelist
     try {
         if ($action === 'add' && $name !== '') {
-            $pdo->prepare('INSERT INTO categories (name) VALUES (?)')->execute([$name]);
+            $pdo->prepare('INSERT INTO categories (name, icon) VALUES (?, ?)')->execute([$name, $icon]);
             flash_set('ok', 'Kategori ditambahkan.');
         } elseif ($action === 'rename' && $id && $name !== '') {
-            $pdo->prepare('UPDATE categories SET name = ? WHERE id = ?')->execute([$name, $id]);
+            $pdo->prepare('UPDATE categories SET name = ?, icon = ? WHERE id = ?')->execute([$name, $icon, $id]);
             flash_set('ok', 'Kategori diubah.');
         } elseif ($action === 'toggle' && $id) {
             $pdo->prepare('UPDATE categories SET is_active = 1 - is_active WHERE id = ?')->execute([$id]);
@@ -41,12 +42,15 @@ include __DIR__ . '/../includes/header.php';
   <h1 class="h4 mb-3">Kategori</h1>
   <form method="post" class="input-group mb-4"><?= csrf_field() ?><input type="hidden" name="action" value="add">
     <input class="form-control" name="name" maxlength="50" placeholder="Nama kategori baru" required>
+    <select class="form-select" name="icon" style="max-width:190px" aria-label="Icon"><?php foreach (CATEGORY_ICONS as $k => $lbl): ?><option value="<?= e($k) ?>"><?= e($lbl) ?></option><?php endforeach; ?></select>
     <button class="btn btn-dark">Tambah</button></form>
   <ul class="list-group">
     <?php foreach ($cats as $c): ?>
       <li class="list-group-item">
         <form method="post" class="d-flex gap-2 align-items-center"><?= csrf_field() ?><input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
+          <i class="bi <?= e(category_icon($c['icon'])) ?> fs-4" aria-hidden="true"></i>
           <input class="form-control" name="name" maxlength="50" value="<?= e($c['name']) ?>">
+          <select class="form-select" name="icon" style="max-width:150px" aria-label="Icon"><?php foreach (CATEGORY_ICONS as $k => $lbl): ?><option value="<?= e($k) ?>" <?= category_icon($c['icon']) === $k ? 'selected' : '' ?>><?= e($lbl) ?></option><?php endforeach; ?></select>
           <span class="badge text-bg-light border"><?= (int) $c['n'] ?> menu</span>
           <button class="btn btn-sm btn-outline-primary" name="action" value="rename">Simpan</button>
           <button class="btn btn-sm btn-outline-<?= $c['is_active'] ? 'secondary' : 'success' ?>" name="action" value="toggle"><?= $c['is_active'] ? 'Nonaktifkan' : 'Aktifkan' ?></button>

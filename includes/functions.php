@@ -308,3 +308,20 @@ function period_status(array $r): array
     }
     return ['Active', 'success'];
 }
+
+/* ---------- Tahap 4: icon kategori ---------- */
+
+/** Whitelist icon Bootstrap Icons untuk kategori: class => label. */
+const CATEGORY_ICONS = [
+    'bi-egg-fried' => 'Makanan', 'bi-cup-straw' => 'Minuman', 'bi-cup-hot' => 'Kopi / Teh', 'bi-cake2' => 'Dessert',
+    'bi-cookie' => 'Snack', 'bi-apple' => 'Buah', 'bi-basket' => 'Paket', 'bi-fire' => 'Bakar / Panas',
+    'bi-droplet' => 'Jus / Air', 'bi-snow' => 'Dingin', 'bi-star' => 'Favorit', 'bi-heart' => 'Spesial',
+    'bi-gift' => 'Promo', 'bi-lightning' => 'Cepat Saji', 'bi-flower1' => 'Sehat', 'bi-bag' => 'Bawa Pulang',
+    'bi-moon-stars' => 'Malam', 'bi-emoji-smile' => 'Anak', 'bi-grid' => 'Umum',
+];
+
+/** Class icon aman untuk dicetak ke HTML; nilai di luar whitelist -> bi-grid. */
+function category_icon($v): string
+{
+    return is_string($v) && isset(CATEGORY_ICONS[$v]) ? $v : 'bi-grid';
+}

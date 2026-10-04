@@ -12,7 +12,7 @@ if (!$table) {
     fail_page('Meja tidak ditemukan', 404);
 }
 
-$page_title = 'Keranjang';
+$page_title = 'Daftar Pesanan';
 $base = '';
 $page = 'cart';
 $body_attrs = ['table' => $table['table_number']];
@@ -22,17 +22,17 @@ include __DIR__ . '/includes/header.php';
   <div class="container d-flex align-items-center">
     <a href="order.php?table=<?= e($table['table_number']) ?>" class="btn btn-sm btn-light me-2" id="back-link">&larr;</a>
     <div>
-      <div class="fw-semibold" id="step-title">Keranjang</div>
+      <div class="fw-semibold" id="step-title">Daftar Pesanan</div>
       <div class="small text-muted">Meja <?= e($table['table_number']) ?></div>
     </div>
   </div>
 </header>
 
 <main class="container py-3 has-cartbar">
-  <!-- Langkah 1: keranjang -->
+  <!-- Langkah 1: daftar pesanan -->
   <section id="step-cart">
     <div id="cart-empty" class="text-center text-muted py-5 d-none">
-      Keranjang masih kosong.<br>
+      Pesanan masih kosong.<br>
       <a href="order.php?table=<?= e($table['table_number']) ?>" class="btn btn-dark mt-3">Lihat Menu</a>
     </div>
     <div id="cart-list" class="list-group mb-3"></div>

@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 delete_menu_image($img ?: null);
                 flash_set('ok', 'Menu dihapus.');
             } catch (PDOException $ex) {
-                // Sudah pernah dipesan (FK order_items): cukup nonaktifkan agar riwayat tetap utuh
+                // Dipakai order_items / promos / flyers (FK): cukup nonaktifkan agar riwayat & relasi tetap utuh
                 $pdo->prepare('UPDATE products SET is_available = 0 WHERE id = ?')->execute([$id]);
-                flash_set('err', 'Menu sudah pernah dipesan sehingga tidak bisa dihapus; ditandai Habis.');
+                flash_set('err', 'Menu sudah pernah dipesan atau dipakai promo/flyer sehingga tidak bisa dihapus; ditandai Habis.');
             }
         }
     } catch (RuntimeException $ex) {

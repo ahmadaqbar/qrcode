@@ -38,7 +38,7 @@ if ($note === false || $name === false) {
     json_response(['ok' => false, 'error' => 'Catatan atau nama terlalu panjang.'], 422);
 }
 if (!$rawItems) {
-    json_response(['ok' => false, 'error' => 'Keranjang kosong. Pilih minimal satu menu.'], 422);
+    json_response(['ok' => false, 'error' => 'Pesanan kosong. Pilih minimal satu menu.'], 422);
 }
 if (count($rawItems) > 50) {
     json_response(['ok' => false, 'error' => 'Terlalu banyak item.'], 422);
@@ -98,7 +98,7 @@ try {
     foreach ($qtyById as $id => $qty) {
         if (!isset($products[$id]) || !$products[$id]['is_available']) {
             $label = isset($products[$id]) ? $products[$id]['name'] : 'Menu';
-            json_response(['ok' => false, 'error' => $label . ' sedang tidak tersedia. Silakan perbarui keranjang.'], 422);
+            json_response(['ok' => false, 'error' => $label . ' sedang tidak tersedia. Silakan perbarui pesanan Anda.'], 422);
         }
         $p = $products[$id];
         $sub = (int) $p['price'] * $qty;

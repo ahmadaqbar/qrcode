@@ -48,7 +48,7 @@
       var d = this.load();
       qty = Math.max(0, Math.min(99, qty));
       if (qty === 0) delete d.items[id]; else d.items[id] = { id: id, name: name, price: price, qty: qty };
-      d.token = null; // isi keranjang berubah => order baru
+      d.token = null; // isi pesanan berubah => order baru
       this.save();
     },
     list: function () {
@@ -63,6 +63,7 @@
   /* ---------- Halaman: menu ---------- */
   function initMenu() {
     var bar = $('#cart-bar');
+    var PD = null; // detail produk (diisi di bawah)
     bar.addEventListener('click', function (ev) { if (Cart.count() === 0) ev.preventDefault(); });
     function refresh() {
       $all('.menu-card').forEach(function (card) {
@@ -89,9 +90,10 @@
       var c = Cart.count();
       bar.classList.toggle('is-empty', c === 0);
       bar.setAttribute('aria-disabled', c === 0 ? 'true' : 'false');
-      $('#cart-label').textContent = c === 0 ? 'Keranjang kosong' : 'Lihat Keranjang';
+      $('#cart-label').textContent = c === 0 ? 'Pesanan kosong' : 'Lihat Pesanan';
       $('#cart-count').textContent = c;
       $('#cart-total').textContent = c === 0 ? '' : rupiah(Cart.total());
+      if (PD) PD.update();
     }
     function change(card, delta) {
       var id = card.getAttribute('data-id');
@@ -104,6 +106,7 @@
         $all('.cat-tabs button').forEach(function (x) {
           var on = x === b;
           x.classList.toggle('btn-dark', on); x.classList.toggle('btn-outline-dark', !on);
+          x.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
         $all('.menu-item').forEach(function (m) {
           m.classList.toggle('d-none', cat !== 'all' && m.getAttribute('data-cat') !== cat);
@@ -112,8 +115,119 @@
         if (menu && menu.scrollIntoView) menu.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
+    PD = initProductDetail(function () { refresh(); });
     refresh();
     initFlyer();
+    initOpenProduct(PD);
+  }
+
+  /* Daftar id produk sesuai konteks klik: top seller / menu yang sedang tampil / tunggal (promo, flyer). */
+  function contextList(el, id) {
+    var top = el.closest('#top-seller');
+    if (top) return $all('.top-card', top).map(function (c) { return parseInt(c.getAttribute('data-id'), 10); });
+    if (el.closest('#menu')) {
+      return $all('.menu-item').filter(function (m) { return !m.classList.contains('d-none'); })
+        .map(function (m) { return parseInt($('.menu-card', m).getAttribute('data-id'), 10); });
+    }
+    return [id];
+  }
+
+  /* Klik gambar/nama produk, banner promo, atau flyer -> detail produk. */
+  function initOpenProduct(pd) {
+    if (!pd) return;
+    function go(el) {
+      var id = parseInt(el.getAttribute('data-open'), 10);
+      if (!id) return;
+      var fm = el.closest('#flyer-modal');
+      if (fm) { // dua modal tidak boleh bertumpuk: tutup flyer dulu
+        fm.addEventListener('hidden.bs.modal', function once() { fm.removeEventListener('hidden.bs.modal', once); pd.open(id, [id]); });
+        window.bootstrap.Modal.getInstance(fm).hide();
+        return;
+      }
+      pd.open(id, contextList(el, id));
+    }
+    document.addEventListener('click', function (ev) {
+      var t = ev.target.closest ? ev.target.closest('.open-product') : null;
+      if (t && t.getAttribute('data-open')) go(t);
+      else if (t && t.classList.contains('flyer-img')) { var m = $('#flyer-modal'); var id = m && m.getAttribute('data-product'); if (id && id !== '0') { t.setAttribute('data-open', id); go(t); } }
+    });
+    document.addEventListener('keydown', function (ev) {
+      if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('open-product')) { ev.preventDefault(); ev.target.click(); }
+    });
+  }
+
+  /* Modal detail produk. Data dari <script id="products-data"> (tanpa request tambahan -> navigasi instan). */
+  function initProductDetail(onChange) {
+    var dataEl = $('#products-data'), modalEl = $('#product-modal');
+    if (!dataEl || !modalEl || !window.bootstrap) return null;
+    var map = {};
+    try { JSON.parse(dataEl.textContent).forEach(function (p) { map[p.id] = p; }); } catch (e) { return null; }
+    var modal = new window.bootstrap.Modal(modalEl);
+    var st = { list: [], i: 0 }, flashTimer = null;
+    var add = $('#pd-add'), minus = $('#pd-minus'), prev = $('#pd-prev'), next = $('#pd-next');
+
+    function cur() { return map[st.list[st.i]]; }
+    function foot() {
+      var p = cur(); if (!p) return;
+      var q = Cart.qty(String(p.id));
+      add.disabled = !p.orderable || q >= 99;
+      add.textContent = p.orderable ? '+ Tambah Pesanan' : 'Tidak tersedia';
+      $('#pd-note').classList.toggle('d-none', p.orderable);
+      minus.classList.toggle('d-none', q === 0);
+      $('#pd-inorder').textContent = q > 0 ? 'Di pesanan: ' + q + ' \u00B7 Total pesanan ' + rupiah(Cart.total()) : '';
+    }
+    function render() {
+      var p = cur(); if (!p) return;
+      var img = $('#pd-img'); img.src = BASE + 'assets/images/' + p.image; img.alt = p.name;
+      $('#pd-name').textContent = p.name;
+      $('#pd-price').textContent = p.price_text;
+      var d = $('#pd-desc'); d.textContent = p.desc; d.classList.toggle('d-none', !p.desc);
+      var multi = st.list.length > 1;
+      prev.classList.toggle('d-none', !multi); next.classList.toggle('d-none', !multi);
+      prev.disabled = st.i === 0; next.disabled = st.i === st.list.length - 1;
+      $('#pd-count').textContent = multi ? (st.i + 1) + ' / ' + st.list.length : '';
+      $('#pd-count').classList.toggle('d-none', !multi);
+      foot();
+    }
+    function go(delta) {
+      var n = st.i + delta;
+      if (n < 0 || n >= st.list.length) return;
+      st.i = n; render();
+    }
+    prev.addEventListener('click', function () { go(-1); });
+    next.addEventListener('click', function () { go(1); });
+    add.addEventListener('click', function () {
+      var p = cur(); if (!p || !p.orderable) return;
+      Cart.set(String(p.id), p.name, p.price, Cart.qty(String(p.id)) + 1);
+      onChange(); // refresh() -> update() -> foot()
+      add.textContent = '\u2713 Ditambahkan';
+      clearTimeout(flashTimer); flashTimer = setTimeout(foot, 900);
+    });
+    minus.addEventListener('click', function () {
+      var p = cur(); if (!p) return;
+      Cart.set(String(p.id), p.name, p.price, Cart.qty(String(p.id)) - 1);
+      onChange();
+    });
+    // swipe kiri/kanan pada gambar & tombol panah keyboard
+    var x0 = null, media = $('#pd-media');
+    media.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    media.addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+    }, { passive: true });
+    modalEl.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') go(-1); else if (e.key === 'ArrowRight') go(1); });
+
+    return {
+      open: function (id, ids) {
+        if (!map[id]) return;
+        var list = (ids || []).filter(function (x) { return map[x]; });
+        if (list.indexOf(id) === -1) list = [id];
+        st.list = list; st.i = list.indexOf(id);
+        render(); modal.show();
+      },
+      update: function () { if (modalEl.classList.contains('show')) foot(); }
+    };
   }
 
   /* Popup flyer: sekali per sesi tab (sessionStorage). Flyer baru (id berbeda) tampil lagi. */
@@ -166,7 +280,7 @@
       step = n;
       $('#step-cart').classList.toggle('d-none', n !== 1);
       $('#step-note').classList.toggle('d-none', n !== 2);
-      $('#step-title').textContent = n === 1 ? 'Keranjang' : 'Catatan Pesanan';
+      $('#step-title').textContent = n === 1 ? 'Daftar Pesanan' : 'Catatan Pesanan';
     }
 
     var d = Cart.load();
@@ -197,7 +311,7 @@
 
     if (items.length === 0) {
       btn.disabled = true;
-      err.textContent = 'Keranjang kosong. Silakan pilih menu terlebih dahulu.';
+      err.textContent = 'Pesanan masih kosong. Silakan pilih menu terlebih dahulu.';
       err.classList.remove('d-none');
       return;
     }
@@ -504,6 +618,45 @@
     poll();
   }
 
-  var inits = { menu: initMenu, cart: initCart, checkout: initCheckout, success: initSuccess, 'order-detail': initOrderDetail, qr: initQr, dashboard: initDashboard };
+  /* ---------- Admin: sidebar collapse (desktop) + penutupan offcanvas (mobile) ---------- */
+  function initSidebar() {
+    var tgl = $('#sidebar-toggle');
+    if (tgl) {
+      var root = document.documentElement;
+      tgl.setAttribute('aria-expanded', root.classList.contains('sb-collapsed') ? 'false' : 'true');
+      tgl.addEventListener('click', function () {
+        var c = root.classList.toggle('sb-collapsed');
+        lsSet('admin_sidebar_collapsed', c ? '1' : '0');
+        tgl.setAttribute('aria-expanded', c ? 'false' : 'true');
+      });
+    }
+    var oc = $('#adminNav');
+    if (oc && window.bootstrap) {
+      $all('.side-link', oc).forEach(function (a) {
+        a.addEventListener('click', function () { var i = window.bootstrap.Offcanvas.getInstance(oc); if (i) i.hide(); });
+      });
+    }
+  }
+
+  /* ---------- Admin: preview produk pada form promo/flyer ---------- */
+  function initBannerAdmin() {
+    var sel = $('#product_id'), box = $('#product-preview');
+    if (!sel || !box) return;
+    function upd() {
+      var o = sel.options[sel.selectedIndex];
+      if (!o || !o.value) { box.classList.add('d-none'); return; }
+      $('#pp-img').src = o.getAttribute('data-img');
+      $('#pp-name').textContent = o.getAttribute('data-name');
+      $('#pp-price').textContent = o.getAttribute('data-price');
+      var ok = o.getAttribute('data-avail') === '1', b = $('#pp-status');
+      b.textContent = ok ? 'Tersedia' : 'Habis';
+      b.className = 'badge text-bg-' + (ok ? 'success' : 'secondary');
+      box.classList.remove('d-none');
+    }
+    sel.addEventListener('change', upd); upd();
+  }
+
+  var inits = { 'banner-admin': initBannerAdmin, menu: initMenu, cart: initCart, checkout: initCheckout, success: initSuccess, 'order-detail': initOrderDetail, qr: initQr, dashboard: initDashboard };
+  initSidebar();
   if (inits[PAGE]) inits[PAGE]();
 })();

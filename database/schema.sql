@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS tables (
 CREATE TABLE IF NOT EXISTS categories (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
-  is_active TINYINT(1) NOT NULL DEFAULT 1
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  icon VARCHAR(40) NULL                      -- class Bootstrap Icons, mis. bi-egg-fried
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS products (
@@ -94,19 +95,23 @@ CREATE TABLE IF NOT EXISTS settings (
 CREATE TABLE IF NOT EXISTS flyers (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
+  product_id INT UNSIGNED NULL,              -- produk tujuan saat gambar diklik
   image VARCHAR(255) NOT NULL,               -- relatif terhadap assets/, mis. uploads/flyers/xxx.jpg
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   start_date DATE NULL,
   end_date DATE NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  KEY idx_flyers_active (is_active, start_date, end_date)
+  KEY idx_flyers_active (is_active, start_date, end_date),
+  KEY idx_flyers_product (product_id),
+  CONSTRAINT fk_flyers_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- Banner promo (slideshow)
 CREATE TABLE IF NOT EXISTS promos (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
+  product_id INT UNSIGNED NULL,              -- produk tujuan saat gambar diklik
   image VARCHAR(255) NOT NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   start_date DATE NULL,
@@ -114,7 +119,9 @@ CREATE TABLE IF NOT EXISTS promos (
   sort_order SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  KEY idx_promos_active (is_active, start_date, end_date, sort_order)
+  KEY idx_promos_active (is_active, start_date, end_date, sort_order),
+  KEY idx_promos_product (product_id),
+  CONSTRAINT fk_promos_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ===== Data contoh =====
@@ -124,7 +131,7 @@ INSERT INTO users (username, password, name) VALUES
 
 INSERT INTO tables (table_number) VALUES ('01'),('02'),('03'),('04'),('05');
 
-INSERT INTO categories (id, name) VALUES (1,'Makanan'),(2,'Minuman'),(3,'Dessert');
+INSERT INTO categories (id, name, icon) VALUES (1,'Makanan','bi-egg-fried'),(2,'Minuman','bi-cup-straw'),(3,'Dessert','bi-cake2');
 
 INSERT INTO products (category_id, name, description, price) VALUES
   (1,'Nasi Goreng','Nasi goreng spesial dengan telur dan ayam',25000),
