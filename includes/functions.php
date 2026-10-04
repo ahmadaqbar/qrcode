@@ -223,3 +223,88 @@ function redirect(string $url): void
     header('Location: ' . $url);
     exit;
 }
+
+/* ---------- Tahap 3: settings, URL dasar, periode aktif ---------- */
+
+/** Kondisi SQL "aktif & dalam periode" (NULL = tanpa batas). Tabel: flyers/promos. */
+const SQL_ACTIVE_PERIOD = 'is_active = 1 AND (start_date IS NULL OR start_date <= CURDATE()) AND (end_date IS NULL OR end_date >= CURDATE())';
+
+function get_setting(string $key, string $default = ''): string
+{
+    $st = db()->prepare('SELECT setting_value FROM settings WHERE setting_key = ?');
+    $st->execute([$key]);
+    $v = $st->fetchColumn();
+    return $v === false ? $default : (string) $v;
+}
+
+function set_setting(string $key, string $value): void
+{
+    db()->prepare('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
+                   ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)')->execute([$key, $value]);
+}
+
+/**
+ * Validasi & normalisasi Base URL. Return URL tanpa trailing slash, atau null bila tidak valid.
+ * Hanya http/https, tanpa HTML/JS/spasi/kutip, tanpa userinfo, query, atau fragment.
+ */
+function normalize_site_url(string $raw): ?string
+{
+    $u = rtrim(trim($raw), '/');
+    if ($u === '' || strlen($u) > 200 || preg_match('/[\s<>"\'`\\\\{}|^]/', $u)) {
+        return null;
+    }
+    if (!preg_match('#^https?://#i', $u) || filter_var($u, FILTER_VALIDATE_URL) === false) {
+        return null;
+    }
+    $p = parse_url($u);
+    if (!$p || empty($p['host']) || isset($p['user']) || isset($p['pass']) || isset($p['query']) || isset($p['fragment'])) {
+        return null;
+    }
+    return $u;
+}
+
+/** Base URL untuk QR: dari settings, atau terdeteksi otomatis bila belum diatur. */
+function site_url(): string
+{
+    try {
+        $v = get_setting('site_url');
+        if ($v !== '' && normalize_site_url($v) !== null) {
+            return normalize_site_url($v);
+        }
+    } catch (Throwable $ex) {
+        error_log($ex->getMessage());
+    }
+    return app_base_url();
+}
+
+/** Tanggal input (Y-m-d) -> string valid, null bila kosong, false bila tidak valid. */
+function parse_date_input($v)
+{
+    $v = is_string($v) ? trim($v) : '';
+    if ($v === '') {
+        return null;
+    }
+    $d = DateTime::createFromFormat('Y-m-d', $v);
+    return ($d && $d->format('Y-m-d') === $v) ? $v : false;
+}
+
+function date_id(?string $d): string
+{
+    return $d ? date('d-m-Y', strtotime($d)) : '-';
+}
+
+/** [label, kelas badge] status flyer/promo berdasarkan is_active & periode (hari ini). */
+function period_status(array $r): array
+{
+    $today = date('Y-m-d');
+    if (!$r['is_active']) {
+        return ['Disabled', 'secondary'];
+    }
+    if ($r['end_date'] && $r['end_date'] < $today) {
+        return ['Expired', 'dark'];
+    }
+    if ($r['start_date'] && $r['start_date'] > $today) {
+        return ['Scheduled', 'info'];
+    }
+    return ['Active', 'success'];
+}

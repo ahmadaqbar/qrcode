@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS products (
   image VARCHAR(255) NULL,                   -- nama file di assets/images/
   is_available TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  is_top_seller TINYINT(1) NOT NULL DEFAULT 0,
+  top_seller_order SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  KEY idx_products_top (is_top_seller, top_seller_order),
   KEY idx_products_category (category_id),
   CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories (id)
 ) ENGINE=InnoDB;
@@ -79,6 +82,41 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   KEY idx_login_ip_created (ip, created_at)
 ) ENGINE=InnoDB;
 
+-- Konfigurasi key/value (mis. site_url untuk QR). Bila site_url belum ada, aplikasi
+-- memakai alamat yang terdeteksi otomatis dari request.
+CREATE TABLE IF NOT EXISTS settings (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  setting_key VARCHAR(50) NOT NULL UNIQUE,
+  setting_value VARCHAR(500) NOT NULL DEFAULT ''
+) ENGINE=InnoDB;
+
+-- Flyer popup "Menu Baru". start_date/end_date NULL = tanpa batas.
+CREATE TABLE IF NOT EXISTS flyers (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(100) NOT NULL,
+  image VARCHAR(255) NOT NULL,               -- relatif terhadap assets/, mis. uploads/flyers/xxx.jpg
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  start_date DATE NULL,
+  end_date DATE NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_flyers_active (is_active, start_date, end_date)
+) ENGINE=InnoDB;
+
+-- Banner promo (slideshow)
+CREATE TABLE IF NOT EXISTS promos (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(100) NOT NULL,
+  image VARCHAR(255) NOT NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  start_date DATE NULL,
+  end_date DATE NULL,
+  sort_order SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_promos_active (is_active, start_date, end_date, sort_order)
+) ENGINE=InnoDB;
+
 -- ===== Data contoh =====
 -- Login staff: staff / staff123  (GANTI password ini di produksi!)
 INSERT INTO users (username, password, name) VALUES
@@ -98,3 +136,8 @@ INSERT INTO products (category_id, name, description, price) VALUES
   (2,'Kopi Susu','Kopi susu gula aren',15000),
   (3,'Pisang Goreng','Pisang goreng crispy dengan topping cokelat',15000),
   (3,'Es Krim Vanilla','Dua scoop es krim vanilla',14000);
+
+-- Contoh Top Seller (urutan tampil 1..3)
+UPDATE products SET is_top_seller = 1, top_seller_order = 1 WHERE name = 'Nasi Goreng';
+UPDATE products SET is_top_seller = 1, top_seller_order = 2 WHERE name = 'Ayam Bakar';
+UPDATE products SET is_top_seller = 1, top_seller_order = 3 WHERE name = 'Kopi Susu';

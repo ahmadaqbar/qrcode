@@ -13,7 +13,7 @@ body.customer { -webkit-tap-highlight-color: transparent; }
 .qty-num { min-width: 1.5rem; text-align: center; font-weight: 600; }
 .btn-qty { width: 40px; height: 40px; padding: 0; font-size: 1.25rem; line-height: 1; border-radius: 50%; }
 
-.has-cartbar { padding-bottom: 5.5rem !important; }
+.has-cartbar { padding-bottom: 7rem !important; }
 .cart-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: space-between;
   align-items: center; gap: 1rem; padding: 1rem 1.25rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   background: var(--brand); color: #fff; text-decoration: none; }
@@ -29,3 +29,72 @@ body.customer { -webkit-tap-highlight-color: transparent; }
 .note-box { background: #fff3cd; border-radius: .5rem; padding: .5rem .75rem; }
 .order-card .btn-lg { min-height: 52px; }
 .qr-holder canvas { width: 100%; max-width: 220px; height: auto; }
+
+/* ---- Section judul customer ---- */
+.section-title { font-size: .8rem; letter-spacing: .08em; font-weight: 700; color: #6c757d; margin: 0 0 .6rem; }
+#menu { scroll-margin-top: 7.5rem; }
+
+/* ---- Top Seller: scroll horizontal hanya di dalam section ---- */
+.hscroll { display: flex; gap: .75rem; overflow-x: auto; overflow-y: hidden; padding: .15rem .1rem .6rem;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.top-card { flex: 0 0 148px; scroll-snap-align: start; border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.1); overflow: hidden; }
+.top-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #e9ecef; }
+.top-name { font-size: .9rem; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; min-height: 2.25em; }
+.top-card .btn-qty { width: 36px; height: 36px; font-size: 1.1rem; }
+.swipe-hint { text-align: center; margin-top: -.15rem; }
+@media (hover: hover) and (min-width: 992px) { .swipe-hint { display: none; } }
+
+/* ---- Promo carousel ---- */
+.promo-carousel { overflow: hidden; }
+.promo-carousel .carousel-inner { border-radius: .75rem; box-shadow: 0 1px 3px rgba(0,0,0,.12); background: #e9ecef; }
+.promo-img { aspect-ratio: 16 / 7; object-fit: cover; width: 100%; height: auto; }
+.promo-carousel .carousel-indicators { position: static; margin: .6rem 0 0; justify-content: center; gap: .4rem; }
+.promo-carousel .carousel-indicators [data-bs-target] { width: 8px; height: 8px; border-radius: 50%; border: 0; margin: 0;
+  background-color: #adb5bd; opacity: 1; padding: 0; }
+.promo-carousel .carousel-indicators .active { background-color: var(--accent); }
+
+/* ---- Popup flyer ---- */
+.flyer-dialog { max-width: min(92vw, 460px); margin-left: auto; margin-right: auto; }
+.flyer-content { border: 0; border-radius: 1rem; overflow: hidden; position: relative; }
+.flyer-img { display: block; width: 100%; height: auto; max-height: calc(100vh - 9rem); max-height: calc(100dvh - 9rem);
+  object-fit: contain; background: #111; }
+.flyer-foot { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem 1rem; background: #fff; }
+.flyer-x { position: absolute; top: .6rem; right: .6rem; z-index: 2; background-color: rgba(255,255,255,.92);
+  border-radius: 50%; padding: .65rem; opacity: 1; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+
+/* ---- Tombol keranjang (aksi utama, beda warna dari footer) ---- */
+.cart-fab { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%);
+  bottom: calc(1rem + env(safe-area-inset-bottom)); width: min(calc(100% - 2rem), 560px);
+  display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  padding: .9rem 1.25rem; border-radius: 999px; background: var(--accent); color: #fff; text-decoration: none;
+  font-weight: 600; box-shadow: 0 6px 18px rgba(217,72,15,.4), 0 2px 4px rgba(0,0,0,.15);
+  transition: background .15s, box-shadow .15s; }
+.cart-fab:hover, .cart-fab:focus { color: #fff; background: #c2410c; }
+.cart-fab:active { transform: translateX(-50%) scale(.98); }
+.cart-fab-main { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+.cart-badge { background: #fff; color: var(--accent); border-radius: 999px; min-width: 1.6rem; height: 1.6rem; padding: 0 .45rem;
+  display: inline-flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 700; }
+.cart-fab-total { white-space: nowrap; }
+.cart-fab.is-empty { background: #fff; color: #6c757d; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,.08); font-weight: 500; }
+.cart-fab.is-empty .cart-badge, .cart-fab.is-empty .cart-fab-total { display: none; }
+
+/* ---- Admin: sidebar + konten ---- */
+.admin-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.admin-main { flex: 1; min-width: 0; }
+.admin-sidebar { --bs-offcanvas-width: 250px; }
+.side-brand { display: block; padding: 1.1rem 1.25rem; font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
+.side-nav { padding-bottom: 1rem; }
+.side-link { display: block; padding: .6rem 1.25rem; color: #ced4da; text-decoration: none; border-left: 3px solid transparent;
+  font-size: .95rem; min-height: 44px; }
+button.side-link { background: transparent; border-top: 0; border-right: 0; border-bottom: 0; }
+.side-link:hover { color: #fff; background: rgba(255,255,255,.06); }
+.side-link.active { color: #fff; background: rgba(255,255,255,.1); border-left-color: var(--accent); font-weight: 600; }
+.side-sep { height: 1px; background: rgba(255,255,255,.12); margin: .5rem 1.25rem; list-style: none; }
+@media (min-width: 992px) {
+  .admin-shell { flex-direction: row; }
+  /* .offcanvas-lg memakai !important di >=lg, jadi override perlu !important juga */
+  .admin-sidebar.offcanvas-lg { flex: 0 0 230px !important; width: 230px !important; height: 100vh !important; position: sticky;
+    top: 0; overflow-y: auto; background-color: #212529 !important; }
+}
+.banner-thumb { aspect-ratio: 16 / 9; object-fit: cover; background: #e9ecef; }

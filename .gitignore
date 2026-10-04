@@ -1,2 +1,6 @@
 config/local.php
 node_modules/
+assets/images/menu/*
+!assets/images/menu/.htaccess
+assets/uploads/*/*
+!assets/uploads/*/.gitkeep

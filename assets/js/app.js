@@ -24,6 +24,10 @@
   }
   function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* abaikan */ } }
+  function ssGet(k) { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } }
+  function ssSet(k, v) { try { window.sessionStorage.setItem(k, v); } catch (e) { /* abaikan */ } }
+  function ssDel(k) { try { window.sessionStorage.removeItem(k); } catch (e) { /* abaikan */ } }
+  var FLYER_KEY = 'new_menu_popup_seen';
   function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) { /* abaikan */ } }
 
   /* ---------- Cart (customer, disimpan di localStorage per meja) ---------- */
@@ -53,12 +57,13 @@
     },
     count: function () { return this.list().reduce(function (s, i) { return s + i.qty; }, 0); },
     total: function () { return this.list().reduce(function (s, i) { return s + i.qty * i.price; }, 0); },
-    clear: function () { this.data = null; lsDel(this.key()); }
+    clear: function () { this.data = null; lsDel(this.key()); ssDel(FLYER_KEY); }
   };
 
   /* ---------- Halaman: menu ---------- */
   function initMenu() {
     var bar = $('#cart-bar');
+    bar.addEventListener('click', function (ev) { if (Cart.count() === 0) ev.preventDefault(); });
     function refresh() {
       $all('.menu-card').forEach(function (card) {
         var box = $('[data-qty-control]', card);
@@ -82,9 +87,11 @@
         }
       });
       var c = Cart.count();
-      bar.classList.toggle('d-none', c === 0);
+      bar.classList.toggle('is-empty', c === 0);
+      bar.setAttribute('aria-disabled', c === 0 ? 'true' : 'false');
+      $('#cart-label').textContent = c === 0 ? 'Keranjang kosong' : 'Lihat Keranjang';
       $('#cart-count').textContent = c;
-      $('#cart-total').textContent = rupiah(Cart.total());
+      $('#cart-total').textContent = c === 0 ? '' : rupiah(Cart.total());
     }
     function change(card, delta) {
       var id = card.getAttribute('data-id');
@@ -101,9 +108,22 @@
         $all('.menu-item').forEach(function (m) {
           m.classList.toggle('d-none', cat !== 'all' && m.getAttribute('data-cat') !== cat);
         });
+        var menu = $('#menu');
+        if (menu && menu.scrollIntoView) menu.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
     refresh();
+    initFlyer();
+  }
+
+  /* Popup flyer: sekali per sesi tab (sessionStorage). Flyer baru (id berbeda) tampil lagi. */
+  function initFlyer() {
+    var fm = $('#flyer-modal');
+    if (!fm || !window.bootstrap) return;
+    var id = fm.getAttribute('data-flyer-id');
+    if (ssGet(FLYER_KEY) === id) return;
+    ssSet(FLYER_KEY, id); // tandai saat tampil, jadi refresh tidak mengulang
+    new window.bootstrap.Modal(fm).show(); // klik area luar = tutup (backdrop default)
   }
 
   /* ---------- Halaman: cart (+ catatan) ---------- */
