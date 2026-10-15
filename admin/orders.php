@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_permission('orders.view');
 
-$filters = ['ALL' => 'Semua', 'NEW' => 'Baru', 'PROCESSING' => 'Diproses', 'COMPLETED' => 'Selesai', 'CANCELLED' => 'Dibatalkan'];
+$filters = ['ALL' => 'Semua', 'DRAFT' => 'Ditahan', 'NEW' => 'Baru', 'PROCESSING' => 'Diproses', 'COMPLETED' => 'Selesai', 'CANCELLED' => 'Dibatalkan'];
 $f = isset($_GET['status']) ? strtoupper((string) $_GET['status']) : 'ALL';
 if (!isset($filters[$f])) {
     $f = 'ALL';
@@ -32,7 +32,7 @@ try {
     error_log($ex->getMessage());
 }
 
-$badge = ['NEW' => 'danger', 'PROCESSING' => 'warning', 'COMPLETED' => 'success', 'CANCELLED' => 'secondary'];
+$badge = ['DRAFT' => 'secondary', 'NEW' => 'danger', 'PROCESSING' => 'warning', 'COMPLETED' => 'success', 'CANCELLED' => 'secondary'];
 $page_title = 'Pesanan';
 $base = '../';
 $admin = true;

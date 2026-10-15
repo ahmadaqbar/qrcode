@@ -295,13 +295,11 @@ try {
         }
     }
     if ($voided) {
-        if (!can('order.void')) {
-            fail('Item yang sudah dikirim ke dapur hanya dapat dikurangi/dibatalkan oleh user dengan izin void.', 403);
-        }
         if ($voidReason === '') {
             fail('Alasan pembatalan item wajib diisi.', 422, ['code' => 'VOID_REASON']);
         }
-        audit('order.item_void', 'order', $orderId, ['reason' => $voidReason, 'items' => $voided]);
+        $approver = authorize('order.void', $in);   // izin sendiri, atau otorisasi supervisor
+        audit('order.item_void', 'order', $orderId, ['reason' => $voidReason, 'items' => $voided, 'approved_by' => $approver['name']]);
     }
 
     // Delivery

@@ -236,3 +236,31 @@ body[data-page="pos"] .admin-main { min-width: 0; }
 .tstat-ORDERING { background: #fee2e2; border-color: #f87171; color: #7f1d1d; }
 .tstat-WAITING_PAYMENT { background: #ede9fe; border-color: #a78bfa; color: #3b0764; }
 .tstat-PAID { background: #e0f2fe; border-color: #7dd3fc; color: #0c4a6e; }
+.pay-sum { text-align: center; margin-bottom: 1rem; }
+.pay-total { font-size: 2rem; font-weight: 800; color: var(--accent); }
+.pay-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: .4rem; margin-bottom: 1rem; }
+.pay-methods .btn { min-height: 48px; }
+.pay-change { font-weight: 700; font-size: 1.1rem; margin-bottom: .5rem; }
+.pay-change-big { font-size: 1.6rem; font-weight: 800; color: var(--accent); margin-top: .5rem; }
+
+/* ================= Kitchen Display ================= */
+.kds-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; align-items: start; }
+.kds-head { font-size: 1rem; font-weight: 700; padding: .5rem .75rem; border-radius: .5rem; color: #fff; margin-bottom: .5rem; }
+.kds-NEW { background: #b91c1c; } .kds-PREPARING { background: #c2410c; } .kds-READY { background: #15803d; } .kds-SERVED { background: #6c757d; }
+.kds-list { display: grid; gap: .6rem; }
+.kds-card { background: #fff; border-radius: .75rem; padding: .75rem; box-shadow: 0 1px 3px rgba(0,0,0,.12); border-top: 4px solid #dee2e6; }
+.kds-card.kds-warn { border-top-color: #f59e0b; } .kds-card.kds-late { border-top-color: #dc2626; }
+.kds-card.kds-late .kds-timer { color: #dc2626; }
+.kds-fresh { animation: kdsflash 1s ease-in-out 3; }
+@keyframes kdsflash { 50% { box-shadow: 0 0 0 6px rgba(220,38,38,.55); } }
+.kds-card-head { display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .4rem; }
+.kds-timer { font-weight: 800; font-size: 1.1rem; }
+.kds-items { list-style: none; padding: 0; margin: 0 0 .6rem; }
+.kds-items li { padding: .2rem 0; border-bottom: 1px dashed #e5e7eb; font-size: 1.05rem; }
+.kds-items li.is-ready { color: #15803d; }
+.kds-qty { font-weight: 800; margin-right: .4rem; }
+.kds-note { font-style: italic; color: #b45309; font-size: .9rem; }
+@media (max-width: 1199.98px) { .kds-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) { .kds-board { grid-template-columns: minmax(0, 1fr); } }
+@media print { .admin-sidebar, .admin-shell > .navbar, .no-print { display: none !important; } .admin-main { width: 100%; } }
+.side-top .side-brand { min-width: 0; text-overflow: ellipsis; margin-right: .5rem; }

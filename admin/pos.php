@@ -84,6 +84,8 @@ include __DIR__ . '/../includes/header.php';
           <li><button class="dropdown-item" type="button" data-act="merge"><i class="bi bi-union"></i> Gabung tagihan</button></li>
           <li><button class="dropdown-item" type="button" data-act="split"><i class="bi bi-scissors"></i> Pisah tagihan</button></li>
           <li><button class="dropdown-item" type="button" data-act="kitchen-ticket"><i class="bi bi-receipt-cutoff"></i> Cetak tiket dapur</button></li>
+          <li><button class="dropdown-item" type="button" data-act="receipt"><i class="bi bi-receipt"></i> Cetak struk</button></li>
+          <li><button class="dropdown-item text-danger" type="button" data-act="refund"><i class="bi bi-arrow-counterclockwise"></i> Refund</button></li>
           <li><hr class="dropdown-divider"></li>
           <li><button class="dropdown-item text-danger" type="button" data-act="cancel"><i class="bi bi-x-octagon"></i> Batalkan transaksi</button></li>
         </ul>

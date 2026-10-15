@@ -213,3 +213,56 @@ function json_input(): array
     }
     return $in;
 }
+
+/**
+ * Otorisasi tindakan sensitif (void, refund, override shift, pindah meja).
+ * - User yang login punya izin -> langsung diizinkan.
+ * - Bila tidak: client harus mengirim kredensial supervisor {auth: {username, password}} (diverifikasi di server,
+ *   dihitung sebagai percobaan login bila salah). Return user yang menyetujui (untuk audit log).
+ */
+function authorize(string $perm, array $in): array
+{
+    if (can($perm)) {
+        return current_user();
+    }
+    $a = isset($in['auth']) && is_array($in['auth']) ? $in['auth'] : null;
+    $label = isset(PERMISSIONS[$perm]) ? PERMISSIONS[$perm] : $perm;
+    if (!$a || empty($a['username']) || !isset($a['password'])) {
+        if (db()->inTransaction()) { db()->rollBack(); }
+        json_response(['ok' => false, 'code' => 'NEED_AUTH', 'permission' => $perm,
+                       'error' => 'Butuh otorisasi supervisor: ' . $label . '.'], 403);
+    }
+    if (login_locked()) {
+        if (db()->inTransaction()) { db()->rollBack(); }
+        json_response(['ok' => false, 'error' => 'Terlalu banyak percobaan. Coba lagi nanti.'], 429);
+    }
+    list($u, $okPass, $okPerm) = check_supervisor((string) $a['username'], (string) $a['password'], $perm);
+    if (!$okPass || !$okPerm) {
+        if (db()->inTransaction()) { db()->rollBack(); }
+        db()->prepare('INSERT INTO login_attempts (ip) VALUES (?)')->execute([client_ip()]);
+        audit('auth.supervisor_failed', 'user', $u ? (int) $u['id'] : null, ['permission' => $perm]);
+        json_response(['ok' => false, 'code' => 'NEED_AUTH', 'permission' => $perm,
+                       'error' => $okPass ? 'User tersebut tidak memiliki izin: ' . $label . '.' : 'Username atau password supervisor salah.'], 403);
+    }
+    return ['id' => (int) $u['id'], 'name' => $u['name'], 'supervisor' => true];
+}
+
+/** Cek kredensial supervisor: [user|null, password_ok, punya_izin]. */
+function check_supervisor(string $username, string $password, string $perm): array
+{
+    $st = db()->prepare('SELECT u.id, u.name, u.password, u.is_active, u.role_id, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id WHERE u.username = ?');
+    $st->execute([$username]);
+    $u = $st->fetch();
+    $okPass = $u && $u['is_active'] && password_verify($password, $u['password']);
+    $okPerm = false;
+    if ($okPass) {
+        if ($u['role_code'] === 'ADMIN') {
+            $okPerm = true;
+        } else {
+            $p = db()->prepare('SELECT COUNT(*) FROM role_permissions WHERE role_id = ? AND permission = ?');
+            $p->execute([$u['role_id'], $perm]);
+            $okPerm = (bool) $p->fetchColumn();
+        }
+    }
+    return [$u ?: null, $okPass, $okPerm];
+}

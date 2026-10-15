@@ -127,9 +127,6 @@
   function changeQty(l, d) {
     var nq = l.qty + d;
     if (nq > 99) return;
-    if (l.id && l.kitchen_status !== 'PENDING' && nq < l.qty && !can('order.void')) {
-      toast('Item sudah dikirim ke dapur. Pengurangan butuh izin void (Manager).', 'warning'); return;
-    }
     if (nq <= 0) {
       if (l.id && l.kitchen_status !== 'PENDING') { l.qty = 0; }
       else S.lines.splice(S.lines.indexOf(l), 1);
@@ -180,7 +177,6 @@
       var m = el('button', 'btn btn-outline-dark btn-qty btn-qty-sm', '−'); m.type = 'button'; m.setAttribute('aria-label', 'Kurangi ' + l.name);
       var pl = el('button', 'btn btn-dark btn-qty btn-qty-sm', '+'); pl.type = 'button'; pl.setAttribute('aria-label', 'Tambah ' + l.name);
       m.disabled = pl.disabled = !editable() || l.qty === 0;
-      if (sent && !can('order.void')) m.disabled = true;
       m.addEventListener('click', function () { changeQty(l, -1); });
       pl.addEventListener('click', function () {
         if (sent) { var p = P[l.product_id]; if (p) addProduct(p); return; }   // tambahan untuk item terkirim = tiket baru
@@ -193,7 +189,7 @@
         var ed = el('button', 'btn btn-sm btn-light border'); ed.type = 'button'; ed.appendChild(icon('bi-pencil')); ed.setAttribute('aria-label', 'Catatan / diskon ' + l.name);
         ed.addEventListener('click', function () { editLine(l); }); tools.appendChild(ed);
       }
-      if (editable() && (!sent || can('order.void')) && l.qty > 0) {
+      if (editable() && l.qty > 0) {
         var rm = el('button', 'btn btn-sm btn-light border text-danger'); rm.type = 'button'; rm.appendChild(icon('bi-trash')); rm.setAttribute('aria-label', 'Hapus ' + l.name);
         rm.addEventListener('click', function () { changeQty(l, -l.qty); }); tools.appendChild(rm);
       }
@@ -271,7 +267,11 @@
       render();
       if (j.code === 'TABLE_BUSY') { tableBusy(j.orders, action); return null; }
       if (j.code === 'VOID_REASON') {
-        askText('Alasan pembatalan item', 'Contoh: salah input, pelanggan batal', function (reason) { save(action, { void_reason: reason }); });
+        askText('Alasan pembatalan item', 'Contoh: salah input, pelanggan batal', function (reason) { save(action, Object.assign({}, extra || {}, { void_reason: reason })); });
+        return null;
+      }
+      if (j.code === 'NEED_AUTH') {
+        askAuth(j.error, function (auth) { save(action, Object.assign({}, extra || {}, { auth: auth })); });
         return null;
       }
       if (j.code === 'CONFLICT') {
@@ -317,8 +317,15 @@
   }
 
   /* ---------- dialog umum ---------- */
-  var fm, fmSubmit = null;
+  var fm, fmSubmit = null, fmHiding = false;
+  $('#formModal').addEventListener('hide.bs.modal', function () { fmHiding = true; });
+  $('#formModal').addEventListener('hidden.bs.modal', function () { fmHiding = false; });
   function dialog(title, buildBody, buttons, onSubmit) {
+    // Modal masih beranimasi menutup: Bootstrap mengabaikan show() -> tunggu sampai benar-benar tertutup
+    if (fmHiding) {
+      $('#formModal').addEventListener('hidden.bs.modal', function once() { $('#formModal').removeEventListener('hidden.bs.modal', once); dialog(title, buildBody, buttons, onSubmit); });
+      return;
+    }
     fm = fm || new bootstrap.Modal($('#formModal'));
     $('#fm-title').textContent = title;
     var b = $('#fm-body'); b.textContent = ''; buildBody(b);
@@ -515,10 +522,9 @@
       visible: function () { return !!S.order && ['DRAFT', 'NEW', 'PROCESSING'].indexOf(S.order.status) !== -1 && S.order.payment_status === 'UNPAID'; },
       run: function () {
         var o = S.order, sent = hasSent();
-        if (sent && !can('order.void')) { toast('Pesanan sudah masuk dapur. Pembatalan butuh izin void (Manager).', 'warning'); return; }
         var go = function (reason) {
-          api('pos-action.php', { action: 'cancel', order_id: o.id, version: o.version, reason: reason || '' }).then(function (j) {
-            if (!j.ok) { toast(j.error, 'danger'); return; }
+          act({ action: 'cancel', order_id: o.id, version: o.version, reason: reason || '' }).then(function (j) {
+            if (!j) return;
             toast('Transaksi ' + o.order_number + ' dibatalkan.', 'success'); S.dirty = false; S = blank(); history.replaceState(null, '', 'pos.php'); render(); refreshQueue();
           });
         };
@@ -526,6 +532,199 @@
         else if (confirm('Batalkan transaksi ' + o.order_number + '?')) go('');
       }
     }
+  };
+  /** Panggil pos-action; otomatis meminta otorisasi supervisor bila server membalas NEED_AUTH. */
+  function act(data) {
+    return api('pos-action.php', data).then(function (j) {
+      if (j.ok) return j;
+      if (j.code === 'NEED_AUTH') {
+        return new Promise(function (res) { askAuth(j.error, function (auth) { res(act(Object.assign({}, data, { auth: auth }))); }); });
+      }
+      toast(j.error || 'Aksi gagal.', 'danger');
+      if (j.code === 'CONFLICT' && S.order) loadOrder(S.order.id, true);
+      return null;
+    });
+  }
+  function askAuth(msg, cb) {
+    var u, pw;
+    dialog('Otorisasi Supervisor', function (b) {
+      b.appendChild(el('div', 'alert alert-warning small py-2', msg));
+      b.appendChild(el('p', 'small text-muted', 'Minta Manager memasukkan username & password. Tercatat di audit log.'));
+      u = field(b, 'Username supervisor', inp('text', '', { autocomplete: 'off', required: 'required' }));
+      pw = field(b, 'Password', inp('password', '', { autocomplete: 'new-password', required: 'required' }));
+    }, [{ text: 'Batal', dismiss: true }, { text: 'Otorisasi', cls: 'btn-dark', submit: true }], function () {
+      if (!u.value || !pw.value) return false;
+      var a = { username: u.value.trim(), password: pw.value }; pw.value = '';
+      setTimeout(function () { cb(a); }, 50);
+    });
+  }
+  function openReceipt(type, extra) {
+    if (!S.order) return;
+    window.open('receipt.php?id=' + S.order.id + '&type=' + type + (extra || '') + '&autoprint=1', 'receipt', 'width=420,height=700');
+  }
+  ACTIONS['print-bill'] = {
+    visible: function () { return !!S.order && ['NEW', 'PROCESSING'].indexOf(S.order.status) !== -1 && !S.dirty; },
+    run: function () { act({ action: 'print_bill', order_id: S.order.id }).then(function (j) { if (j) { applyOrder(j.order); openReceipt('bill'); } }); }
+  };
+  ACTIONS['kitchen-ticket'] = {
+    visible: function () { return !!S.order && hasSent(); },
+    run: function () { openReceipt('kitchen'); }
+  };
+  ACTIONS['move'] = {
+    visible: function () { return !!S.order && S.order.order_type === 'DINE_IN' && ['DRAFT', 'NEW', 'PROCESSING'].indexOf(S.order.status) !== -1 && !S.dirty; },
+    run: function () {
+      openTables(function (t) {
+        if (t.id === S.order.table_id) return;
+        act({ action: 'move', order_id: S.order.id, version: S.order.version, table_id: t.id }).then(function (j) {
+          if (j) { applyOrder(j.order); toast('Dipindah ke Meja ' + t.table_number, 'success'); }
+        });
+      });
+    }
+  };
+  ACTIONS['merge'] = {
+    visible: function () { return !!S.order && S.order.order_type !== 'DELIVERY' && S.order.payment_status === 'UNPAID' && ['DRAFT', 'NEW', 'PROCESSING'].indexOf(S.order.status) !== -1 && !S.dirty; },
+    run: function () {
+      var cands = queue.filter(function (o) { return o.id !== S.order.id && o.order_type !== 'DELIVERY' && o.payment_status === 'UNPAID'; });
+      if (!cands.length) { toast('Tidak ada tagihan lain yang dapat digabung.', 'secondary'); return; }
+      dialog('Gabung ' + S.order.order_number + ' ke…', function (b) {
+        b.appendChild(el('p', 'small text-muted', 'Semua item tagihan ini dipindah ke tagihan tujuan. Tagihan ini lalu ditutup (tercatat "digabung").'));
+        var lg = el('div', 'list-group');
+        cands.forEach(function (o) {
+          var x = el('button', 'list-group-item list-group-item-action d-flex justify-content-between'); x.type = 'button';
+          x.appendChild(el('span', '', o.number + ' · ' + o.place_label)); x.appendChild(el('span', 'fw-semibold', rupiah(o.total)));
+          x.addEventListener('click', function () {
+            fm.hide();
+            act({ action: 'merge', order_id: S.order.id, target_order_id: o.id }).then(function (j) {
+              if (j) { applyOrder(j.order); toast('Tagihan digabung ke ' + j.order.order_number, 'success'); refreshQueue(); }
+            });
+          });
+          lg.appendChild(x);
+        });
+        b.appendChild(lg);
+      }, [{ text: 'Batal', dismiss: true }]);
+    }
+  };
+  ACTIONS['split'] = {
+    visible: function () { return !!S.order && S.order.order_type !== 'DELIVERY' && S.order.payment_status === 'UNPAID' && ['DRAFT', 'NEW', 'PROCESSING'].indexOf(S.order.status) !== -1 && !S.dirty && itemCount() > 1; },
+    run: function () {
+      var inputs = [];
+      dialog('Pisah tagihan ' + S.order.order_number, function (b) {
+        b.appendChild(el('p', 'small text-muted', 'Pilih jumlah item yang dipindah ke tagihan baru (mis. per pelanggan).'));
+        S.lines.forEach(function (l) {
+          if (!l.id || !l.qty) return;
+          var r = el('div', 'd-flex justify-content-between align-items-center mb-2 gap-2');
+          r.appendChild(el('span', 'min-w-0 text-truncate', l.name + ' (' + l.qty + ')'));
+          var i = inp('number', 0, { min: 0, max: l.qty, step: 1, 'aria-label': 'Jumlah ' + l.name }); i.style.maxWidth = '90px';
+          r.appendChild(i); b.appendChild(r); inputs.push({ id: l.id, el: i, max: l.qty });
+        });
+      }, [{ text: 'Batal', dismiss: true }, { text: 'Pisahkan', cls: 'btn-dark', submit: true }], function () {
+        var items = inputs.map(function (x) { return { item_id: x.id, qty: Math.min(x.max, Math.max(0, parseInt(x.el.value, 10) || 0)) }; }).filter(function (x) { return x.qty > 0; });
+        if (!items.length) { toast('Pilih minimal satu item.', 'warning'); return false; }
+        act({ action: 'split', order_id: S.order.id, version: S.order.version, items: items }).then(function (j) {
+          if (j) { applyOrder(j.order); toast('Tagihan baru: ' + j.new_order.order_number + ' (' + rupiah(j.new_order.total) + ')', 'success'); refreshQueue(); }
+        });
+      });
+    }
+  };
+  ACTIONS['receipt'] = {
+    visible: function () { return !!S.order && S.order.payments && S.order.payments.length > 0; },
+    run: function () { openReceipt('customer'); }
+  };
+  ACTIONS['refund'] = {
+    visible: function () { return !!S.order && ['PAID', 'PARTIAL'].indexOf(S.order.payment_status) !== -1; },
+    run: function () {
+      var o = S.order;
+      askText('Alasan refund ' + o.order_number + ' (' + rupiah(o.paid_amount) + ')', 'Wajib diisi, tercatat di audit log', function (reason) {
+        act({ action: 'refund', order_id: o.id, reason: reason }).then(function (j) {
+          if (j) { applyOrder(j.order); toast('Refund ' + rupiah(j.refunded) + ' tercatat.', 'success'); }
+        });
+      });
+    }
+  };
+
+  /* ---------- Pembayaran ---------- */
+  function payDialog(o) {
+    if (!D.shift) {
+      dialog('Shift belum dibuka', function (b) { b.appendChild(el('p', '', 'Buka shift kasir (isi modal awal) sebelum menerima pembayaran.')); },
+        [{ text: 'Tutup', dismiss: true }, { text: 'Buka Shift', cls: 'btn-dark', click: function () { location.href = 'shift.php?return=' + encodeURIComponent('pos.php?order=' + o.id); } }]);
+      return;
+    }
+    var idem = tok(), method = D.methods[0], amt, ten, ref, chg, refWrap, tenWrap;
+    var remaining = o.total - o.paid_amount;
+    dialog('Pembayaran ' + o.order_number, function (b) {
+      var sum = el('div', 'pay-sum');
+      sum.appendChild(el('div', 'small text-muted', 'Sisa tagihan'));
+      sum.appendChild(el('div', 'pay-total', rupiah(remaining)));
+      if (o.paid_amount) sum.appendChild(el('div', 'small text-success', 'Sudah dibayar ' + rupiah(o.paid_amount) + ' dari ' + rupiah(o.total)));
+      b.appendChild(sum);
+      var mg = el('div', 'pay-methods'); mg.setAttribute('role', 'radiogroup'); mg.setAttribute('aria-label', 'Metode pembayaran');
+      D.methods.forEach(function (m, i) {
+        var x = el('button', 'btn ' + (i === 0 ? 'btn-dark' : 'btn-outline-dark'), m.name); x.type = 'button'; x.setAttribute('data-code', m.code);
+        x.addEventListener('click', function () { method = m; $all('.pay-methods .btn').forEach(function (y) { y.className = 'btn ' + (y === x ? 'btn-dark' : 'btn-outline-dark'); }); sync(); });
+        mg.appendChild(x);
+      });
+      b.appendChild(mg);
+      amt = field(b, 'Nominal dibayar (Rp)', inp('number', remaining, { min: 1, max: remaining, step: 1, required: 'required', inputmode: 'numeric' }));
+      tenWrap = el('div');
+      ten = field(tenWrap, 'Uang diterima (Rp)', inp('number', '', { min: 0, step: 1, inputmode: 'numeric', placeholder: 'Kosongkan = uang pas' }));
+      var quick = el('div', 'd-flex flex-wrap gap-1 mb-2');
+      var up = function (n) { return Math.ceil(remaining / n) * n; };
+      [['Uang pas', remaining], [rupiah(up(10000)), up(10000)], [rupiah(up(50000)), up(50000)], [rupiah(up(100000)), up(100000)]].forEach(function (qv, i, arr) {
+        if (i > 0 && qv[1] === arr[i - 1][1]) return;
+        var x = el('button', 'btn btn-sm btn-outline-secondary', qv[0]); x.type = 'button';
+        x.addEventListener('click', function () { ten.value = qv[1]; sync(); }); quick.appendChild(x);
+      });
+      tenWrap.appendChild(quick);
+      chg = el('div', 'pay-change'); tenWrap.appendChild(chg);
+      b.appendChild(tenWrap);
+      refWrap = el('div');
+      ref = field(refWrap, 'No. referensi / approval', inp('text', '', { maxlength: 100, autocomplete: 'off', placeholder: 'Bukan nomor kartu' }));
+      refWrap.appendChild(el('div', 'small text-muted mb-2', 'Dicatat manual — sistem belum terhubung ke payment gateway. Jangan simpan nomor kartu.'));
+      b.appendChild(refWrap);
+      amt.addEventListener('input', sync); ten.addEventListener('input', sync);
+      sync();
+    }, [{ text: 'Batal', dismiss: true }, { text: 'Simpan Pembayaran', cls: 'btn-accent', submit: true }], function () {
+      var a = parseInt(amt.value, 10) || 0, t = parseInt(ten.value, 10) || 0;
+      if (a < 1 || a > remaining) { amt.classList.add('is-invalid'); return false; }
+      if (method.type === 'CASH' && t && t < a) { ten.classList.add('is-invalid'); return false; }
+      if (method.type !== 'CASH' && Number(method.requires_reference) && !ref.value.trim()) { ref.classList.add('is-invalid'); return false; }
+      var btn = $('#fm-foot .btn-accent'); if (btn) btn.disabled = true;
+      api('pos-pay.php', { order_id: o.id, method: method.code, amount: a, tendered: method.type === 'CASH' ? (t || a) : a, reference: ref.value.trim(), idem_key: idem }).then(function (j) {
+        if (!j.ok) {
+          if (j.code === 'NO_SHIFT') { D.shift = null; }
+          if (btn) btn.disabled = false;
+          toast(j.error, 'danger'); if (j.order) applyOrder(j.order); return;
+        }
+        applyOrder(j.order); refreshQueue();
+        if (j.paid_full) paidDialog(j.order, j.change);
+        else { toast('Pembayaran sebagian tercatat. Sisa ' + rupiah(j.order.remaining), 'info'); payDialog(j.order); }
+      }).catch(function () { toast('Koneksi bermasalah. Coba simpan lagi — pembayaran tidak akan tercatat ganda.', 'danger'); if (btn) btn.disabled = false; });
+      return false;   // dialog ditutup setelah respons (pembayaran berikutnya membuka dialog baru)
+    });
+    function sync() {
+      var cash = method.type === 'CASH';
+      tenWrap.classList.toggle('d-none', !cash);
+      refWrap.classList.toggle('d-none', cash);
+      ref.required = !cash && Number(method.requires_reference) === 1;
+      var a = parseInt(amt.value, 10) || 0, t = parseInt(ten.value, 10) || a;
+      chg.textContent = t >= a ? 'Kembalian: ' + rupiah(t - a) : 'Uang kurang ' + rupiah(a - t);
+      chg.classList.toggle('text-danger', t < a);
+    }
+  }
+  function paidDialog(o, change) {
+    dialog('Pembayaran Lunas', function (b) {
+      var w = el('div', 'text-center py-2');
+      w.appendChild(icon('bi-check-circle-fill text-success display-4'));
+      w.appendChild(el('div', 'fs-5 fw-bold mt-2', o.order_number + ' lunas'));
+      w.appendChild(el('div', 'pay-change-big', 'Kembalian ' + rupiah(change)));
+      b.appendChild(w);
+    }, [{ text: 'Cetak Struk', cls: 'btn-outline-dark', click: function () { openReceipt('customer'); } },
+        { text: 'Transaksi Baru', cls: 'btn-dark', click: function () { window.POS.newOrder(); } }]);
+  }
+  window.POS_PAY = function () {
+    var go = function (o) { if (o) payDialog(o); };
+    if (!S.order || S.dirty) save('send', S.separate ? { separate: true } : null).then(go);
+    else go(S.order);
   };
   window.POS_ACTIONS = ACTIONS;
   $all('#more-menu [data-act]').forEach(function (b) {

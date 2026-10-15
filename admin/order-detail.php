@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/orders.php';
 require_permission('orders.view');
 
 $id = filter_var(isset($_GET['id']) ? $_GET['id'] : null, FILTER_VALIDATE_INT);
@@ -9,7 +10,7 @@ if ($id !== false && $id > 0) {
         $st = db()->prepare('SELECT o.*, t.table_number FROM orders o LEFT JOIN tables t ON t.id = o.table_id WHERE o.id = ?');
         $st->execute([$id]);
         $row = $st->fetch();
-        if ($row) {
+        if ($row) {   // $row dipakai untuk rincian biaya & status pembayaran
             $items = fetch_items_for_orders([$row['id']]);
             $order = format_order($row, isset($items[$row['id']]) ? $items[$row['id']] : []);
         }
@@ -21,7 +22,7 @@ if (!$order) {
     http_response_code(404);
 }
 
-$badge = ['NEW' => 'danger', 'PROCESSING' => 'warning', 'COMPLETED' => 'success', 'CANCELLED' => 'secondary'];
+$badge = ['DRAFT' => 'secondary', 'NEW' => 'danger', 'PROCESSING' => 'warning', 'COMPLETED' => 'success', 'CANCELLED' => 'secondary'];
 $page_title = 'Detail Pesanan';
 $base = '../';
 $admin = true;
@@ -40,7 +41,8 @@ include __DIR__ . '/../includes/header.php';
         <div class="small text-muted">Order Number</div>
         <div class="fs-4 fw-bold"><?= e($order['order_number']) ?></div>
       </div>
-      <span class="badge fs-6 text-bg-<?= $badge[$order['status']] ?>" id="order-status"><?= e($order['status_label']) ?></span>
+      <div class="text-end"><span class="badge fs-6 text-bg-<?= $badge[$order['status']] ?>" id="order-status"><?= e($order['status_label']) ?></span>
+        <div class="small mt-1"><span class="badge text-bg-light border text-dark" id="payment-status"><?= e(isset(PAYMENT_STATUS_LABELS[$row['payment_status']]) ? PAYMENT_STATUS_LABELS[$row['payment_status']] : '') ?></span></div></div>
     </div>
     <div class="row g-3 mb-3">
       <div class="col-4"><div class="small text-muted">Table Number</div><div class="fw-semibold"><?= e($order['place_label']) ?></div></div>
@@ -55,7 +57,11 @@ include __DIR__ . '/../includes/header.php';
             <td class="text-center"><?= (int) $i['quantity'] ?></td><td class="text-end"><?= e($i['subtotal_text']) ?></td></tr>
       <?php endforeach; ?>
       </tbody>
-      <tfoot><tr class="fw-bold"><td colspan="2">Total</td><td class="text-end"><?= e($order['total_text']) ?></td></tr></tfoot>
+      <tfoot>
+        <?php foreach ([['Subtotal', $row['subtotal'], 0], ['Diskon', $row['discount_amount'], 1], ['Service', $row['service_amount'], 0], ['Pajak', $row['tax_amount'], 0], ['Ongkos kirim', $row['delivery_fee'], 0], [$row['other_fee_label'] ?: 'Biaya lain', $row['other_fee'], 0]] as $r): if ((int) $r[1] === 0 && $r[0] !== 'Subtotal') { continue; } ?>
+          <tr class="small"><td colspan="2"><?= e($r[0]) ?></td><td class="text-end"><?= $r[2] ? '−' : '' ?><?= e(rupiah($r[1])) ?></td></tr>
+        <?php endforeach; ?>
+        <tr class="fw-bold"><td colspan="2">Total</td><td class="text-end"><?= e($order['total_text']) ?></td></tr></tfoot>
     </table>
     <div class="mb-4"><div class="small text-muted">Notes</div><div class="text-break"><?= nl2br(e($order['note'] ?: '-')) ?></div></div>
 
@@ -63,6 +69,8 @@ include __DIR__ . '/../includes/header.php';
       <?php if ($order['status'] === 'NEW'): ?>
         <button class="btn btn-success btn-lg" data-set-status="PROCESSING">TERIMA PESANAN</button>
         <button class="btn btn-outline-danger" data-set-status="CANCELLED" data-confirm="Batalkan pesanan ini?">BATALKAN PESANAN</button>
+      <?php elseif ($order['status'] === 'PROCESSING' && $order['payment_status'] !== 'PAID'): ?>
+        <a class="btn btn-primary btn-lg" href="pos.php?order=<?= (int) $order['id'] ?>">BAYAR DI KASIR</a>
       <?php elseif ($order['status'] === 'PROCESSING'): ?>
         <button class="btn btn-primary btn-lg" data-set-status="COMPLETED">SELESAIKAN PESANAN</button>
       <?php endif; ?>

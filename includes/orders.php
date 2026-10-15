@@ -190,7 +190,7 @@ function order_full(PDO $pdo, int $id): ?array
             'qty' => (int) $i['quantity'], 'note' => (string) $i['note'], 'subtotal' => (int) $i['subtotal'],
             'discount_type' => $i['discount_type'], 'discount_value' => (int) $i['discount_value'], 'discount_amount' => (int) $i['discount_amount'],
             'station' => $i['station'], 'kitchen_status' => $i['kitchen_status'], 'kitchen_label' => KITCHEN_STATUS_LABELS[$i['kitchen_status']],
-            'batch' => (int) $i['kitchen_batch'],
+            'batch' => (int) $i['kitchen_batch'], 'sent_at' => $i['sent_at'],
         ];
     }
     $d = $pdo->prepare('SELECT d.*, u.name AS courier_name FROM delivery_details d LEFT JOIN users u ON u.id = d.courier_id WHERE d.order_id = ?');
@@ -288,4 +288,23 @@ function active_orders_on_table(PDO $pdo, int $tableId, int $exceptId = 0): arra
                          WHERE table_id = ? AND order_type = 'DINE_IN' AND status IN ('DRAFT','NEW','PROCESSING') AND id <> ? ORDER BY id");
     $st->execute([$tableId, $exceptId]);
     return $st->fetchAll();
+}
+
+/** Dipanggil (di dalam transaksi DB) saat pesanan menjadi LUNAS. Modul stok & integrasi menambahkan prosesnya di sini. */
+function on_order_paid(PDO $pdo, int $orderId): void
+{
+    if (function_exists('inventory_on_paid')) {
+        inventory_on_paid($pdo, $orderId);
+    }
+    if (function_exists('integration_enqueue')) {
+        integration_enqueue($pdo, $orderId, 'SALE');
+    }
+}
+
+/** Dipanggil (di dalam transaksi DB) saat pembayaran pesanan direfund. */
+function on_order_refunded(PDO $pdo, int $orderId): void
+{
+    if (function_exists('integration_enqueue')) {
+        integration_enqueue($pdo, $orderId, 'REFUND');
+    }
 }

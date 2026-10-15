@@ -23,9 +23,10 @@ if ($id === false || $id < 1 || !in_array($new, ORDER_STATUSES, true)) {
 try {
     $pdo = db();
     $pdo->beginTransaction();
-    $st = $pdo->prepare('SELECT status FROM orders WHERE id = ? FOR UPDATE');
+    $st = $pdo->prepare('SELECT status, payment_status, total FROM orders WHERE id = ? FOR UPDATE');
     $st->execute([$id]);
-    $cur = $st->fetchColumn();
+    $row = $st->fetch();
+    $cur = $row ? $row['status'] : false;
     if ($cur === false) {
         $pdo->rollBack();
         json_response(['ok' => false, 'error' => 'Pesanan tidak ditemukan.'], 404);
@@ -33,6 +34,11 @@ try {
     if (!in_array($new, STATUS_TRANSITIONS[$cur], true)) {
         $pdo->rollBack();
         json_response(['ok' => false, 'error' => 'Status sudah berubah (' . status_label($cur) . '). Muat ulang halaman.'], 409);
+    }
+    // Status dapur / penyajian bukan status pembayaran: pesanan hanya ditutup bila sudah lunas.
+    if ($new === 'COMPLETED' && $row['payment_status'] !== 'PAID' && (int) $row['total'] > 0) {
+        $pdo->rollBack();
+        json_response(['ok' => false, 'code' => 'UNPAID', 'error' => 'Pesanan belum dibayar. Selesaikan pembayaran di POS Kasir.'], 409);
     }
     $uid = current_user()['id'];
     if ($new === 'PROCESSING') {

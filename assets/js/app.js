@@ -570,6 +570,10 @@
       if (o.status === 'NEW') {
         acts.appendChild(actionBtn('btn btn-success btn-lg', 'TERIMA PESANAN', o.id, 'PROCESSING'));
         acts.appendChild(actionBtn('btn btn-outline-danger btn-sm', 'Batalkan', o.id, 'CANCELLED', 'Batalkan pesanan ' + o.order_number + '?'));
+      } else if (o.payment_status !== 'PAID') {
+        // Pesanan ditutup lewat pembayaran di POS (status dapur bukan status pembayaran)
+        var pay = el('a', 'btn btn-primary btn-lg', 'BAYAR DI KASIR'); pay.href = 'pos.php?order=' + o.id;
+        acts.appendChild(pay);
       } else {
         acts.appendChild(actionBtn('btn btn-primary btn-lg', 'SELESAIKAN PESANAN', o.id, 'COMPLETED'));
       }
