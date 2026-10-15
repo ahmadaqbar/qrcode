@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 
 if (is_logged_in()) {
-    header('Location: dashboard.php');
+    header('Location: ' . home_page());
     exit;
 }
 
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             if (attempt_login($username, $password)) {
-                header('Location: dashboard.php');
+                header('Location: ' . home_page());
                 exit;
             }
             $error = 'Username atau password salah.';

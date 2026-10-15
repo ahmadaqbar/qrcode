@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_login();
+require_permission('orders.view');
 
 $filters = ['ALL' => 'Semua', 'NEW' => 'Baru', 'PROCESSING' => 'Diproses', 'COMPLETED' => 'Selesai', 'CANCELLED' => 'Dibatalkan'];
 $f = isset($_GET['status']) ? strtoupper((string) $_GET['status']) : 'ALL';
@@ -9,7 +9,7 @@ if (!isset($filters[$f])) {
 }
 
 try {
-    $sql = 'SELECT o.*, t.table_number FROM orders o JOIN tables t ON t.id = o.table_id'
+    $sql = 'SELECT o.*, t.table_number FROM orders o LEFT JOIN tables t ON t.id = o.table_id'
          . ($f === 'ALL' ? '' : ' WHERE o.status = ?') . ' ORDER BY o.id DESC LIMIT 200';
     $st = db()->prepare($sql);
     $st->execute($f === 'ALL' ? [] : [$f]);
@@ -54,14 +54,14 @@ include __DIR__ . '/../includes/header.php';
   <?php if (!empty($dbError)): ?><div class="alert alert-danger">Gagal memuat data.</div><?php endif; ?>
   <div class="table-responsive">
     <table class="table table-hover align-middle bg-white">
-      <thead><tr><th>Order</th><th>Meja</th><th>Waktu</th><th>Item</th><th class="text-end">Total</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th>Order</th><th>Meja / Tipe</th><th>Waktu</th><th>Item</th><th class="text-end">Total</th><th>Status</th><th></th></tr></thead>
       <tbody>
       <?php foreach ($orders as $o):
           $its = isset($items[$o['id']]) ? $items[$o['id']] : [];
           $summary = implode(', ', array_map(function ($i) { return $i['product_name'] . ' x' . $i['quantity']; }, $its)); ?>
         <tr>
           <td class="fw-semibold"><?= e($o['order_number']) ?></td>
-          <td><?= e($o['table_number']) ?></td>
+          <td><?= e(format_order($o, [])['place_label']) ?></td>
           <td><?= e(date('d/m H:i', strtotime($o['created_at']))) ?></td>
           <td class="small text-muted"><?= e(mb_strimwidth($summary, 0, 60, '…', 'UTF-8')) ?></td>
           <td class="text-end"><?= e(rupiah($o['total'])) ?></td>

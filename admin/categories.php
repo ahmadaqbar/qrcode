@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_login();
+require_permission('catalog.manage');
 
 $pdo = db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

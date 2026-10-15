@@ -1,12 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_login();
+require_permission('orders.view');
 
 $id = filter_var(isset($_GET['id']) ? $_GET['id'] : null, FILTER_VALIDATE_INT);
 $order = null;
 if ($id !== false && $id > 0) {
     try {
-        $st = db()->prepare('SELECT o.*, t.table_number FROM orders o JOIN tables t ON t.id = o.table_id WHERE o.id = ?');
+        $st = db()->prepare('SELECT o.*, t.table_number FROM orders o LEFT JOIN tables t ON t.id = o.table_id WHERE o.id = ?');
         $st->execute([$id]);
         $row = $st->fetch();
         if ($row) {
@@ -43,7 +43,7 @@ include __DIR__ . '/../includes/header.php';
       <span class="badge fs-6 text-bg-<?= $badge[$order['status']] ?>" id="order-status"><?= e($order['status_label']) ?></span>
     </div>
     <div class="row g-3 mb-3">
-      <div class="col-4"><div class="small text-muted">Table Number</div><div class="fw-semibold"><?= e($order['table_number']) ?></div></div>
+      <div class="col-4"><div class="small text-muted">Table Number</div><div class="fw-semibold"><?= e($order['place_label']) ?></div></div>
       <div class="col-4"><div class="small text-muted">Time</div><div class="fw-semibold"><?= e(date('d/m/Y H:i', strtotime($order['created_at']))) ?></div></div>
       <div class="col-4"><div class="small text-muted">Customer Name</div><div class="fw-semibold"><?= e($order['customer_name'] ?: '-') ?></div></div>
     </div>

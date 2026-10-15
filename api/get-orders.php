@@ -5,7 +5,7 @@
  * `max_id` = id order terbesar di seluruh tabel (untuk deteksi order baru).
  */
 require_once __DIR__ . '/../includes/auth.php';
-require_login(true);
+require_permission(['dashboard.view', 'orders.view'], true);
 
 $status = isset($_GET['status']) ? strtoupper((string) $_GET['status']) : 'ACTIVE';
 
@@ -21,7 +21,7 @@ try {
         json_response(['ok' => false, 'error' => 'Filter tidak valid.'], 400);
     }
 
-    $st = db()->prepare("SELECT o.*, t.table_number FROM orders o JOIN tables t ON t.id = o.table_id
+    $st = db()->prepare("SELECT o.*, t.table_number FROM orders o LEFT JOIN tables t ON t.id = o.table_id
                          $where ORDER BY o.id DESC LIMIT 200");
     $st->execute($params);
     $rows = $st->fetchAll();

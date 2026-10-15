@@ -5,7 +5,7 @@
  * `token` (32 hex, dibuat client) bersifat idempoten: kirim ulang token yang sama
  * (double click / refresh / retry) tidak membuat order ganda.
  */
-require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/orders.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['ok' => false, 'error' => 'Metode tidak diizinkan.'], 405);
@@ -84,8 +84,8 @@ try {
 
     $ids = array_keys($qtyById);
     $in_sql = implode(',', array_fill(0, count($ids), '?'));
-    $st = $pdo->prepare("SELECT p.id, p.name, p.price, p.is_available
-                         FROM products p JOIN categories c ON c.id = p.category_id AND c.is_active = 1
+    $st = $pdo->prepare("SELECT p.id, p.name, p.price, p.is_available, c.station
+                         FROM products p JOIN categories c ON c.id = p.category_id AND c.is_active = 1 AND p.is_active = 1
                          WHERE p.id IN ($in_sql)");
     $st->execute($ids);
     $products = [];
@@ -94,32 +94,35 @@ try {
     }
 
     $lines = [];
-    $total = 0;
     foreach ($qtyById as $id => $qty) {
-        if (!isset($products[$id]) || !$products[$id]['is_available']) {
+        if (!isset($products[$id]) || !$products[$id]['is_available']) {   // harga & status SELALU dari DB
             $label = isset($products[$id]) ? $products[$id]['name'] : 'Menu';
             json_response(['ok' => false, 'error' => $label . ' sedang tidak tersedia. Silakan perbarui pesanan Anda.'], 422);
         }
         $p = $products[$id];
-        $sub = (int) $p['price'] * $qty;
-        $total += $sub;
-        $lines[] = [$id, $p['name'], (int) $p['price'], $qty, $sub];
+        $lines[] = ['product_id' => $id, 'product_name' => $p['name'], 'price' => (int) $p['price'], 'quantity' => $qty,
+                    'subtotal' => (int) $p['price'] * $qty, 'station' => $p['station']];
     }
+    // Pajak & service memakai tarif yang berlaku saat ini (disimpan sebagai snapshot di pesanan)
+    $rates = pricing_snapshot('DINE_IN');
+    $t = compute_totals($lines, $rates);
 
     $pdo->beginTransaction();
     try {
-        // Nomor sementara, diganti ORD-xxxxxx dari id setelah insert
-        $pdo->prepare('INSERT INTO orders (order_number, order_token, client_ip, table_id, customer_name, note, total, status)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, \'NEW\')')
-            ->execute(['T' . substr($token, 0, 15), $token, client_ip(), $table['id'], $name, $note, $total]);
-        $orderId = (int) $pdo->lastInsertId();
+        $orderId = insert_order($pdo, [
+            'order_token' => $token, 'client_ip' => client_ip(), 'table_id' => $table['id'], 'order_type' => 'DINE_IN', 'source' => 'QR',
+            'customer_name' => $name, 'note' => $note, 'status' => 'NEW',
+            'subtotal' => $t['subtotal'], 'service_rate' => $rates['service_rate'], 'service_amount' => $t['service_amount'],
+            'tax_rate' => $rates['tax_rate'], 'tax_include_service' => $rates['tax_include_service'], 'tax_amount' => $t['tax_amount'],
+            'total' => $t['total'],
+        ]);
         $number = sprintf('ORD-%06d', $orderId);
-        $pdo->prepare('UPDATE orders SET order_number = ? WHERE id = ?')->execute([$number, $orderId]);
 
-        $ins = $pdo->prepare('INSERT INTO order_items (order_id, product_id, product_name, price, quantity, subtotal)
-                              VALUES (?, ?, ?, ?, ?, ?)');
+        // Item belum dikirim ke dapur (PENDING) sampai staf/kasir menerima pesanan
+        $ins = $pdo->prepare('INSERT INTO order_items (order_id, product_id, product_name, price, quantity, subtotal, station)
+                              VALUES (?, ?, ?, ?, ?, ?, ?)');
         foreach ($lines as $l) {
-            $ins->execute([$orderId, $l[0], $l[1], $l[2], $l[3], $l[4]]);
+            $ins->execute([$orderId, $l['product_id'], $l['product_name'], $l['price'], $l['quantity'], $l['subtotal'], $l['station']]);
         }
         $pdo->commit();
     } catch (Throwable $ex) {

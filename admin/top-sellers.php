@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_login();
+require_permission('catalog.manage');
 
 const TOP_SELLER_LIMIT = 8; // jumlah maksimum yang tampil ke customer
 

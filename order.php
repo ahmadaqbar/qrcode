@@ -10,6 +10,7 @@ try {
     $categories = db()->query('SELECT id, name, icon FROM categories WHERE is_active = 1 ORDER BY id')->fetchAll();
     $products = db()->query('SELECT p.id, p.category_id, p.name, p.description, p.price, p.image, p.is_available
                              FROM products p JOIN categories c ON c.id = p.category_id AND c.is_active = 1
+                             WHERE p.is_active = 1
                              ORDER BY p.category_id, p.name')->fetchAll();
 } catch (Throwable $ex) {
     error_log($ex->getMessage());
@@ -26,9 +27,9 @@ try {
     $promos = db()->query('SELECT id, title, image, product_id FROM promos WHERE ' . SQL_ACTIVE_PERIOD . ' ORDER BY sort_order ASC, id DESC LIMIT 10')->fetchAll();
     $topSellers = db()->query('SELECT p.id, p.name, p.price, p.image FROM products p
                                JOIN categories c ON c.id = p.category_id AND c.is_active = 1
-                               WHERE p.is_top_seller = 1 AND p.is_available = 1
+                               WHERE p.is_top_seller = 1 AND p.is_available = 1 AND p.is_active = 1
                                ORDER BY p.top_seller_order ASC, p.id ASC LIMIT 8')->fetchAll();
-    foreach (db()->query('SELECT p.id, p.name, p.description, p.price, p.image, (p.is_available = 1 AND c.is_active = 1) AS orderable
+    foreach (db()->query('SELECT p.id, p.name, p.description, p.price, p.image, (p.is_available = 1 AND p.is_active = 1 AND c.is_active = 1) AS orderable
                           FROM products p JOIN categories c ON c.id = p.category_id')->fetchAll() as $dp) {
         $detailProducts[(int) $dp['id']] = [
             'id' => (int) $dp['id'], 'name' => $dp['name'], 'desc' => (string) $dp['description'], 'price' => (int) $dp['price'],
