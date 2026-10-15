@@ -264,3 +264,18 @@ body[data-page="pos"] .admin-main { min-width: 0; }
 @media (max-width: 575.98px) { .kds-board { grid-template-columns: minmax(0, 1fr); } }
 @media print { .admin-sidebar, .admin-shell > .navbar, .no-print { display: none !important; } .admin-main { width: 100%; } }
 .side-top .side-brand { min-width: 0; text-overflow: ellipsis; margin-right: .5rem; }
+
+/* ================= Laporan (satu seri per grafik, bar horizontal) ================= */
+.reports { --viz-series: #2a78d6; --viz-track: #eef0f2; --viz-text: #0b0b0b; --viz-text-2: #52514e; }
+.viz-hero-label, .viz-tile-label { font-size: .8rem; color: var(--viz-text-2); }
+.viz-hero-value { font-size: 3rem; font-weight: 700; line-height: 1.1; color: var(--viz-text); word-break: break-word; }
+.viz-tile-value { font-size: 1.15rem; font-weight: 700; color: var(--viz-text); }
+.viz-bars { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; }
+.viz-bars li { display: grid; grid-template-columns: minmax(90px, 30%) minmax(0, 1fr) auto; align-items: center; gap: .6rem; font-size: .9rem; }
+.viz-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--viz-text); }
+.viz-track { height: 14px; display: block; }
+.viz-bar { display: block; height: 14px; background: var(--viz-series); border-radius: 0 4px 4px 0; min-width: 2px; }
+.viz-bars li:hover .viz-bar { filter: brightness(.9); }
+.viz-value { font-weight: 600; white-space: nowrap; color: var(--viz-text); text-align: right; }
+.viz-value small { display: block; font-weight: 400; color: var(--viz-text-2); font-size: .75rem; }
+@media (max-width: 575.98px) { .viz-bars li { grid-template-columns: minmax(0, 1fr) auto; } .viz-track { grid-column: 1 / -1; order: 3; } .viz-hero-value { font-size: 2.4rem; } }
