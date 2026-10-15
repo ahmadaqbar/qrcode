@@ -279,3 +279,4 @@ body[data-page="pos"] .admin-main { min-width: 0; }
 .viz-value { font-weight: 600; white-space: nowrap; color: var(--viz-text); text-align: right; }
 .viz-value small { display: block; font-weight: 400; color: var(--viz-text-2); font-size: .75rem; }
 @media (max-width: 575.98px) { .viz-bars li { grid-template-columns: minmax(0, 1fr) auto; } .viz-track { grid-column: 1 / -1; order: 3; } .viz-hero-value { font-size: 2.4rem; } }
+.enqueue-range input[type=date] { width: auto; min-width: 0; flex: 1 1 140px; }

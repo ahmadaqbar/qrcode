@@ -5,7 +5,7 @@ Staff login → dashboard (polling 4 detik, popup + notifikasi browser + suara) 
 
 ## Setup
 1. `mysql -u root -p < database/schema.sql` (membuat DB `restaurant_ordering` + data contoh).
-   Upgrade dari versi lama (berurutan, masing-masing sekali): `database/migrations/002_security_and_admin.sql`, lalu `003_flyers_promos_topseller_settings.sql`, lalu `004_product_links_category_icons.sql`
+   Upgrade dari versi lama (berurutan, masing-masing sekali): `database/migrations/002_security_and_admin.sql`, lalu `003_flyers_promos_topseller_settings.sql`, lalu `004_product_links_category_icons.sql`, `005_pos_foundation.sql`, `006_pos_operations.sql`, `007_delivery_inventory.sql`, `008_accurate_integration.sql` (backup dulu — lihat docs/BACKUP.md)
 2. Kredensial DB via env (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`) atau buat `config/local.php`:
    ```php
    <?php return ['user' => 'app', 'pass' => 'rahasia'];
@@ -40,3 +40,25 @@ Notifikasi suara: klik **AKTIFKAN** sekali saat membuka dashboard (aturan autopl
 - **Detail produk** (modal, bottom-sheet di HP): klik gambar/nama di menu & Top Seller, atau gambar promo/flyer. Prev/Next mengikuti daftar yang sedang tampil (menu terfilter / top seller), bisa di-swipe. Tombol **+ Tambah Pesanan** menambah qty (tanpa duplikat); produk Habis dinonaktifkan. Server tetap memvalidasi produk & harga saat order.
 - **Istilah "Keranjang" -> "Pesanan"** di seluruh tampilan customer (nama internal `cart` tidak diubah).
 - **Kategori ber-icon** (Bootstrap Icons lokal, whitelist; dipilih admin di Categories) dan dapat digeser horizontal.
+
+## POS restoran (tahap 5)
+Satu sumber data: pesanan QR dan POS memakai tabel `orders`/`order_items` yang sama (pesanan QR dibayar di POS memakai record yang sama).
+
+| Modul | Halaman | Catatan |
+|---|---|---|
+| POS Kasir | `/admin/pos.php` | Produk + kategori ber-icon, cari nama/SKU, dine-in/takeaway/delivery, catatan & diskon item/transaksi, hold/resume, antrean pesanan QR, cegah tagihan ganda per meja, optimistic locking antar perangkat |
+| Meja | `/admin/floor.php` | Status Available / Occupied / Ordering / Waiting Payment / Paid diturunkan dari transaksi; pindah, gabung, pisah tagihan |
+| Pembayaran | dialog di POS | Tunai (kembalian), Debit/Kartu, QRIS, Transfer, E-wallet, Lainnya — **dicatat manual, tanpa payment gateway**; bayar sebagian; anti bayar ganda (row lock + idempotency key); refund tercatat sebagai baris negatif |
+| Kitchen Display | `/admin/kitchen.php` | Tiket per pesanan × area (Kitchen/Bar) × kiriman; Baru → Disiapkan → Siap → Selesai; durasi; suara & kedip untuk tiket baru |
+| Shift kasir | `/admin/shift.php` | Modal awal, kas masuk/keluar, tutup shift (selisih kas), blokir bila ada hold/bayar sebagian kecuali override manager |
+| Delivery | `/admin/delivery.php` | Data antar seperlunya, tugaskan kurir, status New → … → Delivered + riwayat, struk antar; kurir hanya melihat tugasnya |
+| Struk | `/admin/receipt.php` | Struk pelanggan, tagihan, tiket dapur, delivery — 58/80 mm (docs/PRINTING.md) |
+| Inventory | `/admin/inventory.php` | Stok produk jadi (bukan bahan baku/resep) |
+| Laporan | `/admin/reports.php` | Penjualan sah, per metode/kategori/tipe, terlaris, void, refund, shift, transaksi belum selesai |
+| Settings | `/admin/settings.php` | Pajak, service, ongkir, struk, metode pembayaran (tarif disimpan per transaksi) |
+| Users & Roles | `/admin/users.php`, `/admin/roles.php` | Administrator, Manager, Kasir, Waiter, Kitchen, Delivery Staff; izin diperiksa di server; otorisasi supervisor untuk void/refund/pindah meja |
+| Integrasi Accurate | `/admin/accurate.php` | Antrean + simulasi + HTTP bridge; **belum terverifikasi dengan Accurate sungguhan** — lihat docs/ACCURATE_INTEGRATION.md |
+| Audit Log | `/admin/audit.php` | Void, refund, diskon, shift, pengaturan, user, integrasi |
+
+Cron yang disarankan: `* * * * * php cron/integration-worker.php` dan backup harian `tools/backup.sh` (docs/BACKUP.md).
+Folder `cron/` dan `tools/` tidak boleh diakses dari web (Apache: `.htaccess` sudah ada; Nginx: tambahkan `deny`).
