@@ -367,3 +367,11 @@ function theme_logo(): ?string
     }
     return null;
 }
+
+
+/** Versi aset berdasarkan waktu ubah file, supaya browser tidak memakai CSS/JS lama dari cache. */
+function asset_ver(string $path): string
+{
+    $f = __DIR__ . '/../' . $path;
+    return is_file($f) ? (string) filemtime($f) : '1';
+}

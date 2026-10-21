@@ -17,8 +17,8 @@ $admin = !empty($admin);
   <script>document.documentElement.className += " js";</script>
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="<?= $base ?>assets/css/style.css">
-  <link rel="stylesheet" href="<?= $base ?>assets/css/theme-african.css">
+  <link rel="stylesheet" href="<?= $base ?>assets/css/style.css?v=<?= asset_ver('assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= $base ?>assets/css/theme-african.css?v=<?= asset_ver('assets/css/theme-african.css') ?>">
   <link rel="preload" href="<?= $base ?>assets/fonts/alfa-slab-one-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="<?= $base ?>assets/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <?php if ($admin): ?>
