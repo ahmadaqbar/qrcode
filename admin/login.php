@@ -33,13 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $page_title = 'Login Staff';
 $base = '../';
 $admin = true;
+$body_class = 'login-page';
 include __DIR__ . '/../includes/header.php';
 ?>
 <div class="container login-wrap">
   <div class="card shadow-sm mx-auto" style="max-width:380px">
     <div class="card-body p-4">
+      <?php if ($logo = theme_logo()): ?><div class="text-center mb-2"><img src="../assets/<?= e($logo) ?>" alt="" height="48"></div><?php endif; ?>
       <h1 class="h4 text-center mb-1"><?= e(APP_NAME) ?></h1>
-      <p class="text-center text-muted mb-4">Login Staff</p>
+      <div class="ornament-rule" role="presentation"></div>
+      <p class="text-center mb-4"><span class="stamp stamp-solid">Login Staff</span></p>
       <?php if ($error): ?><div class="alert alert-danger py-2"><?= e($error) ?></div><?php endif; ?>
       <form method="post" autocomplete="off">
         <?= csrf_field() ?>

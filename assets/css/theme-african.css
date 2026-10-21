@@ -330,3 +330,72 @@ body.customer main.paper-panel + .site-footer, body.customer .panel-lone ~ .site
 /* judul header yang panjang boleh turun baris alih-alih terpotong */
 .cust-brand .btn-back + .cust-name { white-space: normal; line-height: 1.1; font-size: 1.05rem; }
 @media (max-width: 380px) { .table-stamp { font-size: .8rem; padding: .25rem .5rem; } }
+
+/* =====================================================================
+   FASE D — ADMIN & STAFF (tema lebih ringan, fungsional)
+   ===================================================================== */
+body.admin { background-color: var(--paper-2); }
+.admin-main { background-color: var(--paper-2); }
+
+/* Sidebar: arang/navy + pita tribal di tepi atas & bawah, item aktif oranye */
+.admin-sidebar { background-color: var(--navy) !important; color: var(--paper); }
+.admin-sidebar::before, .admin-sidebar::after { content: ""; position: absolute; left: 0; right: 0; height: 14px; background: var(--img-zigzag) repeat-x; pointer-events: none; z-index: 2; }
+.admin-sidebar::before { top: 0; }
+.admin-sidebar::after { bottom: 0; }
+.admin-sidebar .offcanvas-header { padding-top: 1.4rem; }
+.admin-sidebar .offcanvas-body { padding-top: .9rem !important; padding-bottom: 1.4rem !important; }
+.side-top { padding-top: 1.5rem; }
+.side-brand { font-family: var(--font-head); font-weight: 400; letter-spacing: .01em; color: var(--paper); }
+.side-top .side-brand { font-size: .85rem; min-width: 0; text-overflow: ellipsis; }
+.side-link { color: #d9d2c3; border-left-width: 4px; }
+.side-link:hover { color: #fff; background: rgba(246,239,226,.09); }
+.side-link.active { color: var(--ink); background: var(--orange-d); border-left-color: var(--mustard); font-weight: 600; }
+.side-sep { background: rgba(246,239,226,.16); }
+.side-toggle { border-color: rgba(246,239,226,.35); }
+.admin-shell > .navbar { position: relative; background-color: var(--navy) !important; padding-bottom: 1rem; }
+.admin-shell > .navbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: var(--img-zigzag) repeat-x; }
+.navbar-brand { font-family: var(--font-head); font-weight: 400; letter-spacing: .03em; }
+
+/* Judul halaman admin */
+.admin-main h1.h4 { font-size: 1.5rem; color: var(--ink); }
+.admin-main h2.h5, .admin-main h2.h6 { font-weight: 600; color: var(--ink); }
+.admin-main .card { box-shadow: var(--shadow-sm); }
+
+/* Dashboard pesanan: border kiri berwarna per status, aksi besar */
+.order-card { border: 1px solid var(--line); border-left-width: 8px; border-radius: var(--radius); background: var(--bone); box-shadow: var(--shadow-sm); }
+.order-card.border-danger { border-left-color: var(--crimson) !important; }
+.order-card.border-warning { border-left-color: var(--mustard) !important; }
+.order-card .fs-5.fw-bold { font-family: var(--font-head); font-weight: 400; color: var(--ink); letter-spacing: .02em; }
+.order-card .btn-lg { min-height: 56px; font-size: 1.1rem; letter-spacing: .03em; }
+.order-card .btn-success { background-color: var(--teal-d); border-color: var(--ink); color: #fff; box-shadow: 0 2px 0 var(--ink); }
+.order-card .btn-primary { background-color: var(--blue); border-color: var(--ink); color: #fff; box-shadow: 0 2px 0 var(--ink); }
+.note-box { background: #fbeac0; border: 1px dashed #d8a73a; color: var(--ink); }
+#notif-banner { border-radius: 0; border-left: 0; border-bottom: 3px solid var(--mustard); }
+
+/* Login: latar tribal penuh, kartu krem berbingkai */
+body.login-page { background-color: var(--navy); background-image: var(--img-tribal); background-size: 240px 240px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.login-page .login-wrap { padding-top: 9vh; flex: 1 0 auto; }
+.login-page .login-wrap .card { background-color: var(--paper); background-image: var(--img-paper); max-width: 400px;
+  --frame-w: 16px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; border-radius: 0; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.login-page h1 { color: var(--ink); font-size: 1.7rem; }
+.login-page .site-footer { margin-top: auto; background: var(--ink); color: var(--paper); border-top: 3px solid var(--mustard); }
+
+/* Halaman QR: bingkai etnik HANYA di luar area QR; QR tetap hitam di atas putih tanpa pola */
+.qr-card { --frame-w: 12px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; border-radius: 0; background: var(--bone); box-shadow: var(--shadow-sm); }
+.qr-card .card-body { padding: .6rem .5rem .8rem; }
+.qr-card .fw-bold { font-family: var(--font-head); font-weight: 400; font-size: 1.15rem; letter-spacing: .04em; }
+.qr-holder { display: block; width: max-content; max-width: 100%; background: #fff; padding: 8px; border: 2px solid var(--ink); border-radius: 6px; }
+.qr-holder canvas { display: block; background: #fff; }
+
+/* Cetak: bersih, kontras tinggi, tanpa pola/bingkai berwarna */
+@media print {
+  body.admin, .admin-main { background: #fff !important; }
+  .admin-sidebar, .admin-shell > .navbar, .no-print, .site-footer, .alert, .toast-container { display: none !important; }
+  .admin-main { width: 100% !important; display: block !important; }
+  .qr-card { break-inside: avoid; page-break-inside: avoid; border: 2px solid #000 !important; border-image: none !important; box-shadow: none !important; }
+  .qr-holder { border: 1px solid #000; }
+  .qr-card .btn { display: none !important; }
+  .qr-card .text-muted { color: #000 !important; }
+  .row > [class*="col-"] { flex: 0 0 33.333% !important; max-width: 33.333% !important; }
+}
+@media (min-width: 992px) { .admin-sidebar.offcanvas-lg { background-color: var(--navy) !important; } }

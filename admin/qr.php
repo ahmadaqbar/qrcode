@@ -48,8 +48,8 @@ $extra_scripts = ['assets/vendor/qrcode.js'];
 include __DIR__ . '/../includes/header.php';
 ?>
 <div class="container py-3">
-  <h1 class="h4 mb-3">QR Code Management</h1>
-  <div class="card mb-4"><div class="card-body">
+  <h1 class="h4 mb-3 no-print">QR Code Management</h1>
+  <div class="card mb-4 qr-controls no-print"><div class="card-body">
     <form method="post" class="row g-2 align-items-end">
       <?= csrf_field() ?><input type="hidden" name="action" value="save">
       <div class="col-12 col-lg">
@@ -69,7 +69,7 @@ include __DIR__ . '/../includes/header.php';
   <div class="row g-3">
     <?php foreach ($tables as $t): $url = $root . '/order.php?table=' . rawurlencode($t['table_number']); ?>
       <div class="col-6 col-md-4 col-lg-3">
-        <div class="card text-center h-100"><div class="card-body">
+        <div class="card text-center h-100 qr-card"><div class="card-body">
           <div class="fw-bold mb-2">Meja <?= e($t['table_number']) ?></div>
           <div class="qr-holder mx-auto mb-2" data-url="<?= e($url) ?>" data-table="<?= e($t['table_number']) ?>"></div>
           <div class="small text-muted text-break mb-2"><?= e($url) ?></div>

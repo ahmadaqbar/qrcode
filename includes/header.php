@@ -25,7 +25,7 @@ $admin = !empty($admin);
   <script>try { if (localStorage.getItem('admin_sidebar_collapsed') === '1') document.documentElement.classList.add('sb-collapsed'); } catch (e) {}</script>
 <?php endif; ?>
 </head>
-<body class="<?= $admin ? 'admin' : 'customer' ?><?= is_file(ROOT_PATH . '/assets/images/theme/bg-scenic.webp') ? ' has-bg-scenic' : '' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
+<body class="<?= $admin ? 'admin' : 'customer' ?><?= isset($body_class) ? ' ' . e($body_class) : '' ?><?= is_file(ROOT_PATH . '/assets/images/theme/bg-scenic.webp') ? ' has-bg-scenic' : '' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
 <?php foreach ($body_attrs as $k => $v): ?> data-<?= e($k) ?>="<?= e($v) ?>"<?php endforeach; ?>>
 <?php
 $admin_shell = $admin && is_logged_in();
