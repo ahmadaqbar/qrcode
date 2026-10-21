@@ -18,14 +18,14 @@ $admin = !empty($admin);
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/css/style.css?v=<?= asset_ver('assets/css/style.css') ?>">
-  <link rel="stylesheet" href="<?= $base ?>assets/css/theme-african.css?v=<?= asset_ver('assets/css/theme-african.css') ?>">
-  <link rel="preload" href="<?= $base ?>assets/fonts/alfa-slab-one-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="<?= $base ?>assets/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="<?= $base ?>assets/css/quiet.css?v=<?= asset_ver('assets/css/quiet.css') ?>">
+  <link rel="preload" href="<?= $base ?>assets/fonts/dm-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="<?= $base ?>assets/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <?php if ($admin): ?>
   <script>try { if (localStorage.getItem('admin_sidebar_collapsed') === '1') document.documentElement.classList.add('sb-collapsed'); } catch (e) {}</script>
 <?php endif; ?>
 </head>
-<body class="<?= $admin ? 'admin' : 'customer' ?><?= isset($body_class) ? ' ' . e($body_class) : '' ?><?= is_file(ROOT_PATH . '/assets/images/theme/bg-scenic.webp') ? ' has-bg-scenic' : '' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
+<body class="<?= $admin ? 'admin' : 'customer' ?><?= $admin ? '' : (($v = theme_body_class()) !== '' ? ' ' . $v : '') ?><?= isset($body_class) ? ' ' . e($body_class) : '' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
 <?php foreach ($body_attrs as $k => $v): ?> data-<?= e($k) ?>="<?= e($v) ?>"<?php endforeach; ?>>
 <?php
 $admin_shell = $admin && is_logged_in();

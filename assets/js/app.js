@@ -10,7 +10,7 @@
   /* ---------- util ---------- */
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-  function rupiah(n) { return 'Rp' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function rupiah(n) { return 'Rp ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -64,6 +64,7 @@
   function initMenu() {
     var bar = $('#cart-bar');
     var PD = null; // detail produk (diisi di bawah)
+    var lastCount = null; // untuk efek denyut saat jumlah berubah
     bar.addEventListener('click', function (ev) { if (Cart.count() === 0) ev.preventDefault(); });
     function refresh() {
       $all('.menu-card').forEach(function (card) {
@@ -90,9 +91,11 @@
       var c = Cart.count();
       bar.classList.toggle('is-empty', c === 0);
       bar.setAttribute('aria-disabled', c === 0 ? 'true' : 'false');
-      $('#cart-label').textContent = c === 0 ? 'Pesanan kosong' : 'Lihat Pesanan';
+      $('#cart-label').textContent = c === 0 ? 'Belum ada pesanan' : 'Lihat Pesanan';
       $('#cart-count').textContent = c;
       $('#cart-total').textContent = c === 0 ? '' : rupiah(Cart.total());
+      if (lastCount !== null && c !== lastCount && c > 0) { bar.classList.remove('pulse'); void bar.offsetWidth; bar.classList.add('pulse'); }
+      lastCount = c;
       if (PD) PD.update();
     }
     function change(card, delta) {
@@ -120,17 +123,6 @@
     refresh();
     initFlyer();
     initOpenProduct(PD);
-    initReveal();
-  }
-
-  /* Fade-in halus saat kartu masuk layar (tema). Tanpa IntersectionObserver: tampil biasa. */
-  function initReveal() {
-    var items = $all('.reveal');
-    if (!('IntersectionObserver' in window)) { items.forEach(function (i) { i.classList.add('in'); }); return; }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-    }, { rootMargin: '0px 0px -5% 0px' });
-    items.forEach(function (i) { io.observe(i); });
   }
 
   /* Daftar id produk sesuai konteks klik: top seller / menu yang sedang tampil / tunggal (promo, flyer). */
@@ -190,7 +182,7 @@
     }
     function render() {
       var p = cur(); if (!p) return;
-      var img = $('#pd-img'); img.src = BASE + 'assets/images/' + p.image; img.alt = p.name;
+      var img = $('#pd-img'); img.src = BASE + 'assets/images/' + p.image; img.alt = p.name; markLoading(img);
       $('#pd-name').textContent = p.name;
       $('#pd-price').textContent = p.price_text;
       var d = $('#pd-desc'); d.textContent = p.desc; d.classList.toggle('d-none', !p.desc);
@@ -258,31 +250,38 @@
     var list = $('#cart-list');
     var footer = $('#cart-footer');
     var next = $('#btn-next');
+    var IMAGES = {};
+    try { IMAGES = JSON.parse($('#cart-images').textContent) || {}; } catch (e) { IMAGES = {}; }
 
     function render() {
       var items = Cart.list();
       list.textContent = '';
       $('#cart-empty').classList.toggle('d-none', items.length > 0);
       footer.classList.toggle('d-none', items.length === 0);
+      $('#cart-summary').classList.toggle('d-none', items.length === 0);
       items.forEach(function (it) {
-        var row = el('div', 'list-group-item');
-        var top = el('div', 'd-flex justify-content-between');
-        top.appendChild(el('div', 'fw-semibold', it.name));
-        var del = el('button', 'btn btn-sm btn-link text-danger p-0', 'Hapus');
+        var row = el('div', 'q-row');
+        var img = el('img', 'q-row-img'); img.alt = ''; img.width = 56; img.height = 56;
+        img.src = BASE + 'assets/images/' + (IMAGES[it.id] || 'placeholder.svg'); markLoading(img);
+        row.appendChild(img);
+        var main = el('div', 'q-row-main');
+        main.appendChild(el('div', 'q-row-name', it.name));
+        main.appendChild(el('div', 'q-row-unit', rupiah(it.price)));
+        var del = el('button', 'btn btn-link q-row-del', 'Hapus');
         del.type = 'button';
         del.addEventListener('click', function () { Cart.set(it.id, it.name, it.price, 0); render(); });
-        top.appendChild(del);
-        row.appendChild(top);
-        var bottom = el('div', 'd-flex justify-content-between align-items-center mt-2');
-        bottom.appendChild(el('div', 'text-muted small', it.qty + ' x ' + rupiah(it.price) + ' = ' + rupiah(it.qty * it.price)));
+        main.appendChild(del);
+        row.appendChild(main);
+        var side = el('div', 'q-row-side');
         var ctl = el('div', 'qty-control');
-        var m = el('button', 'btn btn-outline-dark btn-qty', '−'); m.type = 'button';
+        var m = el('button', 'btn btn-outline-dark btn-qty', '−'); m.type = 'button'; m.setAttribute('aria-label', 'Kurangi');
         m.addEventListener('click', function () { Cart.set(it.id, it.name, it.price, it.qty - 1); render(); });
-        var p = el('button', 'btn btn-dark btn-qty', '+'); p.type = 'button';
+        var p = el('button', 'btn btn-dark btn-qty', '+'); p.type = 'button'; p.setAttribute('aria-label', 'Tambah');
         p.addEventListener('click', function () { Cart.set(it.id, it.name, it.price, it.qty + 1); render(); });
         ctl.appendChild(m); ctl.appendChild(el('span', 'qty-num', String(it.qty))); ctl.appendChild(p);
-        bottom.appendChild(ctl);
-        row.appendChild(bottom);
+        side.appendChild(ctl);
+        side.appendChild(el('div', 'q-row-sub', rupiah(it.qty * it.price)));
+        row.appendChild(side);
         list.appendChild(row);
       });
       $('#cart-total').textContent = rupiah(Cart.total());
@@ -293,6 +292,7 @@
       $('#step-cart').classList.toggle('d-none', n !== 1);
       $('#step-note').classList.toggle('d-none', n !== 2);
       $('#step-title').textContent = n === 1 ? 'Daftar Pesanan' : 'Catatan Pesanan';
+      next.textContent = n === 1 ? 'Lanjutkan' : 'Konfirmasi Pesanan';
     }
 
     var d = Cart.load();
@@ -329,9 +329,9 @@
     }
     var box = $('#c-items');
     items.forEach(function (it) {
-      var r = el('div', 'd-flex justify-content-between');
+      var r = el('div', 'q-line');
       r.appendChild(el('span', '', it.name + ' x' + it.qty));
-      r.appendChild(el('span', 'text-muted', rupiah(it.qty * it.price)));
+      r.appendChild(el('span', 'q-line-price', rupiah(it.qty * it.price)));
       box.appendChild(r);
     });
     $('#c-total').textContent = rupiah(Cart.total());
@@ -363,7 +363,7 @@
         .catch(function (e) {
           err.textContent = e && e.message && e.message !== 'Failed to fetch' ? e.message : 'Koneksi bermasalah. Silakan coba lagi.';
           err.classList.remove('d-none');
-          busy = false; btn.disabled = false; btn.textContent = 'PESAN SEKARANG';
+          busy = false; btn.disabled = false; btn.textContent = 'Kirim Pesanan';
         });
     });
   }
@@ -416,6 +416,7 @@
             last = j.status;
             $('#order-status').textContent = j.status_label;
             $('#order-status').setAttribute('data-status', j.status);
+            var steps = $('#order-steps'); if (steps) steps.setAttribute('data-status', j.status);
             $('#wait-msg').textContent = msgs[j.status] || '';
           }
         })
@@ -670,6 +671,14 @@
   }
 
   var inits = { 'banner-admin': initBannerAdmin, menu: initMenu, cart: initCart, checkout: initCheckout, success: initSuccess, 'order-detail': initOrderDetail, qr: initQr, dashboard: initDashboard };
+  /* Skeleton gambar: tandai gambar yang belum selesai dimuat (tampilan saja). */
+  function markLoading(img) {
+    if (img.complete && img.naturalWidth) return;
+    img.classList.add('is-loading');
+    var done = function () { img.classList.remove('is-loading'); };
+    img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true });
+  }
+  if (body.classList.contains('customer')) $all('.menu-img, .top-img, .promo-img').forEach(markLoading);
   initSidebar();
   if (inits[PAGE]) inits[PAGE]();
 })();

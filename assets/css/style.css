@@ -1,0 +1,60 @@
+/* Dasar bersama + admin. Tampilan customer & tema ada di quiet.css (dimuat setelah file ini). */
+.open-product { cursor: pointer; }
+.min-w-0 { min-width: 0; }
+
+/* ---- Admin ---- */
+.login-wrap { padding-top: 12vh; }
+.order-card { border-width: 2px; }
+.note-box { background: #fff3cd; border-radius: .5rem; padding: .5rem .75rem; }
+.order-card .btn-lg { min-height: 52px; }
+.qr-holder canvas { width: 100%; max-width: 220px; height: auto; }
+.banner-thumb { aspect-ratio: 16 / 9; object-fit: cover; background: #e9ecef; }
+
+.admin-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.admin-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.admin-main .site-footer { margin-top: auto; }
+.admin-sidebar { --bs-offcanvas-width: 250px; }
+.side-brand { display: block; padding: 1.1rem 1.25rem; font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
+.side-nav { padding-bottom: 1rem; }
+.side-link { display: flex; align-items: center; gap: .85rem; white-space: nowrap; padding: .6rem 1.25rem; color: #ced4da; text-decoration: none;
+  border-left: 3px solid transparent; font-size: .95rem; min-height: 44px; }
+button.side-link { background: transparent; border-top: 0; border-right: 0; border-bottom: 0; }
+.side-link .bi { font-size: 1.15rem; width: 1.25rem; text-align: center; flex: 0 0 auto; }
+.side-link:hover { color: #fff; background: rgba(255,255,255,.06); }
+.side-link.active { color: #fff; background: rgba(255,255,255,.1); border-left-color: var(--accent, #d9480f); font-weight: 600; }
+.side-sep { height: 1px; background: rgba(255,255,255,.12); margin: .5rem 1.25rem; list-style: none; }
+.side-top { align-items: center; justify-content: space-between; padding: .6rem .75rem .6rem 1.25rem; min-height: 60px; }
+.side-top .side-brand { padding: 0; overflow: hidden; white-space: nowrap; }
+.side-toggle { background: transparent; border: 1px solid rgba(255,255,255,.25); color: #fff; width: 40px; height: 40px; border-radius: .5rem; font-size: 1.2rem; line-height: 1; flex: 0 0 auto; }
+.side-toggle:hover { background: rgba(255,255,255,.1); }
+@media (min-width: 992px) {
+  .admin-shell { flex-direction: row; }
+  /* .offcanvas-lg memakai !important di >=lg, jadi override perlu !important juga */
+  .admin-sidebar.offcanvas-lg { flex: 0 0 230px !important; width: 230px !important; height: 100vh !important; position: sticky;
+    top: 0; overflow-y: auto; overflow-x: hidden; background-color: #212529 !important; transition: flex-basis .3s ease, width .3s ease; }
+  .sb-collapsed .admin-sidebar.offcanvas-lg { flex: 0 0 68px !important; width: 68px !important; }
+  .sb-collapsed .side-text { display: none; }
+  .sb-collapsed .side-top { justify-content: center; padding: .6rem 0; }
+  .sb-collapsed .side-link { justify-content: center; padding-left: 0; padding-right: 0; gap: 0; }
+  .sb-collapsed .side-sep { margin-left: .75rem; margin-right: .75rem; }
+}
+@media (prefers-reduced-motion: reduce) { .admin-sidebar.offcanvas-lg { transition: none !important; } }
+
+/* tabel promo/flyer + preview produk */
+.banner-thumb-sm { width: 96px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: .4rem; background: #e9ecef; display: block; }
+.banner-table td, .banner-table th { vertical-align: middle; }
+.product-preview { display: flex; align-items: center; gap: .75rem; padding: .6rem; border: 1px dashed #ced4da; border-radius: .5rem; background: #fff; min-height: 64px; }
+.product-preview img { object-fit: cover; border-radius: .4rem; background: #e9ecef; flex: 0 0 auto; }
+
+/* icon kategori (upload .ico/.png) */
+.cat-ico { width: 20px; height: 20px; object-fit: contain; flex: 0 0 auto; }
+.cat-ico-lg { width: 40px; height: 40px; object-fit: contain; }
+i.cat-ico-lg { font-size: 2rem; line-height: 40px; text-align: center; color: #6c757d; }
+.cat-row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.cat-row-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ced4da; border-radius: .5rem; background: #f8f9fa; flex: 0 0 auto; }
+.cat-row-fields { flex: 1 1 220px; min-width: 0; }
+.cat-row-actions { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+
+/* footer (login, staff, customer) */
+.site-footer { text-align: center; font-size: .8rem; color: #6c757d; padding: 1.25rem 1rem; }
+@media print { .site-footer { display: none; } }
