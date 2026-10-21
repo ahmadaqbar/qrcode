@@ -5,10 +5,10 @@
    ===================================================================== */
 
 /* ---------- Font (lokal, latin subset, font-display: swap) ---------- */
-@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/poppins-latin-400-normal.woff2") format("woff2"); }
-@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/poppins-latin-600-normal.woff2") format("woff2"); }
-@font-face { font-family: "Poppins"; font-style: normal; font-weight: 800; font-display: swap; src: url("../fonts/poppins-latin-800-normal.woff2") format("woff2"); }
-@font-face { font-family: "Alfa Slab One"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/alfa-slab-one-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("../../fonts/legacy/poppins-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600; font-display: swap; src: url("../../fonts/legacy/poppins-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 800; font-display: swap; src: url("../../fonts/legacy/poppins-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Alfa Slab One"; font-style: normal; font-weight: 400; font-display: swap; src: url("../../fonts/legacy/alfa-slab-one-latin-400-normal.woff2") format("woff2"); }
 
 /* ---------- Design tokens ---------- */
 :root {
@@ -32,14 +32,14 @@
   /* spasi */
   --space-1: .25rem; --space-2: .5rem; --space-3: 1rem; --space-4: 1.5rem; --space-5: 3rem;
   /* aset pola (relatif terhadap file CSS ini) */
-  --img-tribal: url("../images/theme/pattern-tribal.svg");
-  --img-tribal-soft: url("../images/theme/pattern-tribal-soft.svg");
-  --img-paper: url("../images/theme/paper.svg");
-  --img-zigzag: url("../images/theme/divider-zigzag.svg");
-  --img-zigzag-v: url("../images/theme/divider-zigzag-v.svg");
-  --img-ornament: url("../images/theme/divider-ornament.svg");
-  --img-frame: url("../images/theme/frame-border.svg");
-  --img-stamp: url("../images/theme/stamp-ring.svg");
+  --img-tribal: url("../../images/legacy/pattern-tribal.svg");
+  --img-tribal-soft: url("../../images/legacy/pattern-tribal-soft.svg");
+  --img-paper: url("../../images/legacy/paper.svg");
+  --img-zigzag: url("../../images/legacy/divider-zigzag.svg");
+  --img-zigzag-v: url("../../images/legacy/divider-zigzag-v.svg");
+  --img-ornament: url("../../images/legacy/divider-ornament.svg");
+  --img-frame: url("../../images/legacy/frame-border.svg");
+  --img-stamp: url("../../images/legacy/stamp-ring.svg");
   /* peta ke variabel yang sudah dipakai style.css & Bootstrap */
   --accent: var(--orange-d);
   --brand: var(--ink);
@@ -169,7 +169,7 @@ a { text-underline-offset: 2px; }
    FASE B — HALAMAN CUSTOMER
    ===================================================================== */
 body.customer { background-color: var(--navy); background-image: linear-gradient(rgba(15,27,45,.6), rgba(15,27,45,.6)), var(--img-tribal); background-size: auto, 240px 240px; }
-body.customer.has-bg-scenic { background-image: url("../images/theme/bg-scenic.webp"); background-size: cover; background-position: center top; }
+body.customer.has-bg-scenic { background-image: url("../../images/legacy/bg-scenic.webp"); background-size: cover; background-position: center top; }
 
 /* Hero / header: pola tribal gelap + overlay agar teks tetap terbaca */
 .cust-header { position: sticky; top: 0; z-index: 1020; color: var(--paper); border-bottom: 3px solid var(--ink); padding: .65rem 0 .5rem;
