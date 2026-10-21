@@ -40,3 +40,7 @@ Notifikasi suara: klik **AKTIFKAN** sekali saat membuka dashboard (aturan autopl
 - **Detail produk** (modal, bottom-sheet di HP): klik gambar/nama di menu & Top Seller, atau gambar promo/flyer. Prev/Next mengikuti daftar yang sedang tampil (menu terfilter / top seller), bisa di-swipe. Tombol **+ Tambah Pesanan** menambah qty (tanpa duplikat); produk Habis dinonaktifkan. Server tetap memvalidasi produk & harga saat order.
 - **Istilah "Keranjang" -> "Pesanan"** di seluruh tampilan customer (nama internal `cart` tidak diubah).
 - **Kategori ber-icon** (Bootstrap Icons lokal, whitelist; dipilih admin di Categories) dan dapat digeser horizontal.
+
+## Tambahan setelah tahap 4
+- **Footer "Copyright © <tahun> IT Division"** di halaman Login, seluruh halaman Staff/Admin, dan semua halaman Customer (menu, pesanan, konfirmasi, sukses). Pada halaman menu, footer diberi ruang agar tidak tertutup tombol *Lihat Pesanan*; tidak ikut tercetak.
+- **Icon kategori = upload file `.ico` atau `.png`** (`/admin/categories.php`), bukan lagi dropdown template. Validasi ekstensi + MIME asli + ukuran (maks 512KB) + dimensi (maks 1024x1024); nama file diacak, disimpan di `assets/uploads/categories/`. Icon dapat diganti atau dihapus; file lama ikut dibersihkan. Kategori tanpa icon (atau data lama berformat `bi-*`) tetap tampil dengan ikon bawaan.

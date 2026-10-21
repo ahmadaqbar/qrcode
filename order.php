@@ -58,7 +58,7 @@ include __DIR__ . '/includes/header.php';
     <div class="cat-tabs mt-2">
       <button class="btn btn-sm btn-dark" data-cat="all" aria-pressed="true"><i class="bi bi-grid-fill" aria-hidden="true"></i> Semua</button>
       <?php foreach ($categories as $c): ?>
-        <button class="btn btn-sm btn-outline-dark" data-cat="<?= (int) $c['id'] ?>" aria-pressed="false"><i class="bi <?= e(category_icon($c['icon'])) ?>" aria-hidden="true"></i> <?= e($c['name']) ?></button>
+        <button class="btn btn-sm btn-outline-dark" data-cat="<?= (int) $c['id'] ?>" aria-pressed="false"><?= category_icon_html($c['icon'], $base) ?> <?= e($c['name']) ?></button>
       <?php endforeach; ?>
     </div>
   </div>

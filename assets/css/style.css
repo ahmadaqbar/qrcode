@@ -167,3 +167,21 @@ button.side-link { background: transparent; border-top: 0; border-right: 0; bord
 .product-preview { display: flex; align-items: center; gap: .75rem; padding: .6rem; border: 1px dashed #ced4da; border-radius: .5rem; background: #fff; min-height: 64px; }
 .product-preview img { object-fit: cover; border-radius: .4rem; background: #e9ecef; flex: 0 0 auto; }
 .min-w-0 { min-width: 0; }
+
+/* ---- Footer (login, staff, customer) ---- */
+.site-footer { text-align: center; font-size: .8rem; color: #6c757d; padding: 1.25rem 1rem; }
+.site-footer-fab { padding-bottom: 6.5rem; }
+.has-cartbar { padding-bottom: 1rem !important; }
+.admin-main { display: flex; flex-direction: column; }
+.admin-main .site-footer { margin-top: auto; }
+@media print { .site-footer { display: none; } }
+
+/* ---- Icon kategori (upload .ico/.png) ---- */
+.cat-ico { width: 20px; height: 20px; object-fit: contain; flex: 0 0 auto; }
+.cat-tabs .cat-ico { background: #fff; border-radius: 50%; padding: 2px; box-sizing: content-box; width: 18px; height: 18px; }
+.cat-ico-lg { width: 40px; height: 40px; object-fit: contain; }
+i.cat-ico-lg { font-size: 2rem; line-height: 40px; text-align: center; color: #6c757d; }
+.cat-row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.cat-row-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ced4da; border-radius: .5rem; background: #f8f9fa; flex: 0 0 auto; }
+.cat-row-fields { flex: 1 1 220px; min-width: 0; }
+.cat-row-actions { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }

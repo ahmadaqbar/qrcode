@@ -1,4 +1,9 @@
-<?php $base = isset($base) ? $base : ''; ?>
+<?php
+$base = isset($base) ? $base : '';
+// Halaman customer dengan tombol/bar tetap di bawah: beri ruang agar footer tidak tertutup
+$footerFab = in_array(isset($page) ? $page : '', ['menu', 'cart', 'checkout'], true);
+?>
+<footer class="site-footer<?= $footerFab ? ' site-footer-fab' : '' ?>">Copyright &copy; <?= date('Y') ?> IT Division</footer>
 <?php if (!empty($admin_shell)): ?>
   </div><!-- /admin-main -->
 </div><!-- /admin-shell -->
