@@ -120,28 +120,26 @@ def divider_thin():
     return svg(24, 14, b)
 
 
-# ---------- frame-border.svg : 72x72, slice 24 -> bingkai foto ----------
+# ---------- frame-border.svg : 72x72, slice 24 -> bingkai foto (pita krem + segitiga, garis merah bertitik di sisi foto) ----------
 def frame():
-    W = 72
-    b = '<rect width="72" height="72" fill="%s"/>' % CREAM
-    # cincin luar merah bertitik (4px)
-    b += '<rect x="0" y="0" width="72" height="72" fill="%s"/>' % CRIMSON
-    b += '<rect x="4" y="4" width="64" height="64" fill="%s"/>' % CREAM
-    for i in range(0, 72, 6):
-        for (x, y) in ((i + 3, 2), (i + 3, 70), (2, i + 3), (70, i + 3)):
-            b += '<circle cx="%d" cy="%d" r="1.2" fill="%s"/>' % (x, y, CREAM)
-    # pita dalam 24px: segitiga oranye/biru bergantian + belah ketupat di sudut
-    b += '<rect x="4" y="4" width="64" height="20" fill="%s"/><rect x="4" y="48" width="64" height="20" fill="%s"/>' % (INK, INK)
-    b += '<rect x="4" y="24" width="20" height="24" fill="%s"/><rect x="48" y="24" width="20" height="24" fill="%s"/>' % (INK, INK)
-    for x in range(0, 72, 12):   # atas & bawah (periode 12 membagi 24)
-        c1, c2 = (ORANGE, BLUE) if (x // 12) % 2 == 0 else (BLUE, ORANGE)
-        b += '<polygon points="%d,22 %d,6 %d,22" fill="%s"/>' % (x + 2, x + 8, x + 14, c1)
-        b += '<polygon points="%d,50 %d,66 %d,50" fill="%s"/>' % (x + 2, x + 8, x + 14, c2)
-    for y in range(24, 48, 12):  # kiri & kanan
-        b += '<polygon points="22,%d 6,%d 22,%d" fill="%s"/><polygon points="50,%d 66,%d 50,%d" fill="%s"/>' % (y + 2, y + 8, y + 14, ORANGE, y + 2, y + 8, y + 14, BLUE)
-    for (cx, cy) in ((14, 14), (58, 14), (14, 58), (58, 58)):
-        b += '<polygon points="%d,%d %d,%d %d,%d %d,%d" fill="%s" stroke="%s" stroke-width="1.5"/>' % (cx, cy - 9, cx + 9, cy, cx, cy + 9, cx - 9, cy, MUSTARD, INK)
-    b += '<rect x="24" y="24" width="24" height="24" fill="%s"/>' % CREAM
+    SAND = '#EBD9B4'
+    b = '<rect width="72" height="72" fill="%s"/>' % SAND
+    b += '<rect x="24" y="24" width="24" height="24" fill="none"/>'
+    # segitiga bergantian navy / oranye di pita (atas, bawah, kiri, kanan); periode 12 membagi 24
+    for x in range(0, 72, 12):
+        c1, c2 = (NAVY, ORANGE) if (x // 12) % 2 == 0 else (ORANGE, NAVY)
+        b += '<polygon points="%d,3 %d,17 %d,3" fill="%s"/>' % (x + 1, x + 6, x + 11, c1)
+        b += '<polygon points="%d,69 %d,55 %d,69" fill="%s"/>' % (x + 1, x + 6, x + 11, c2)
+    for y in range(24, 48, 12):
+        b += '<polygon points="3,%d 17,%d 3,%d" fill="%s"/><polygon points="69,%d 55,%d 69,%d" fill="%s"/>' % (y + 1, y + 6, y + 11, NAVY, y + 1, y + 6, y + 11, ORANGE)
+    for (cx, cy) in ((12, 12), (60, 12), (12, 60), (60, 60)):
+        b += '<polygon points="%d,%d %d,%d %d,%d %d,%d" fill="%s" stroke="%s" stroke-width="1.5"/>' % (cx, cy - 10, cx + 10, cy, cx, cy + 10, cx - 10, cy, MUSTARD, CRIMSON)
+    # garis merah dengan titik krem tepat di sisi foto (area 20..24 dan 48..52)
+    b += '<rect x="22" y="22" width="28" height="28" fill="none" stroke="%s" stroke-width="4"/>' % CRIMSON
+    for i in range(23, 50, 5):
+        for (x, y) in ((i, 22), (i, 50), (22, i), (50, i)):
+            b += '<circle cx="%s" cy="%s" r="1" fill="%s"/>' % (x, y, CREAM)
+    b += '<rect x="0.75" y="0.75" width="70.5" height="70.5" fill="none" stroke="%s" stroke-width="1.5"/>' % INK
     return svg(72, 72, b)
 
 

@@ -132,9 +132,9 @@ a { text-underline-offset: 2px; }
 /* Panel kertas krem: noise halus + halftone memudar di kiri/bawah */
 .paper-panel { position: relative; isolation: isolate; background-color: var(--paper); background-image: var(--img-paper); color: var(--text); }
 .paper-panel::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background-image: radial-gradient(circle, rgba(20,17,15,.20) 1.1px, transparent 1.6px); background-size: 8px 8px;
-  -webkit-mask-image: linear-gradient(90deg, #000, transparent 34%), linear-gradient(0deg, #000, transparent 22%);
-          mask-image: linear-gradient(90deg, #000, transparent 34%), linear-gradient(0deg, #000, transparent 22%); }
+  background-image: radial-gradient(circle, rgba(20,17,15,.20) 1.1px, transparent 1.6px), var(--img-tribal-soft); background-size: 8px 8px, 220px 220px;
+  -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.55), transparent 46%), linear-gradient(0deg, rgba(0,0,0,.5), transparent 26%);
+          mask-image: linear-gradient(90deg, rgba(0,0,0,.55), transparent 46%), linear-gradient(0deg, rgba(0,0,0,.5), transparent 26%); }
 .paper-panel::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 0; top: 0; bottom: 0; width: 14px; background: var(--img-zigzag-v) repeat-y left top; }
 
 /* Pemisah ornamen */
@@ -153,7 +153,7 @@ a { text-underline-offset: 2px; }
 
 /* Harga ringkas ala menu cetak: "17,5 K" */
 .price-short { font-weight: 800; color: var(--ink); white-space: nowrap; letter-spacing: -.01em; }
-.price-short b { font-weight: 800; color: var(--orange-dd); margin-left: .12em; }
+.price-short b { font-weight: 800; color: inherit; margin-left: .45em; }
 
 /* Animasi halus */
 @keyframes th-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -200,14 +200,13 @@ body.customer main.paper-panel, body.customer .paper-panel.container { max-width
 /* Judul kategori di daftar menu */
 .menu-cat-head { margin-top: 1rem; }
 .menu-cat-head:first-child { margin-top: .25rem; }
-.menu-cat-title { display: inline-block; margin: 0; padding: .35rem 1rem; font-family: var(--font-head); font-size: 1.05rem; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--paper); background: var(--ink); border-radius: 6px; box-shadow: 3px 3px 0 var(--orange-d); }
+.menu-cat-title { display: block; margin: 0; padding: 0; font-family: var(--font-body); font-size: 1.35rem; font-weight: 800; letter-spacing: .01em; text-transform: uppercase; line-height: 1.2; color: var(--ink); }
 
 /* Bingkai foto (satu aturan untuk semua gambar menu/promo/flyer/detail) */
 .menu-img, .top-img, .pd-media img { --frame-w: 8px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; box-sizing: border-box; background-color: var(--ink); object-fit: cover; }
 
 /* Kartu menu: gaya buku menu */
-.menu-card { background: var(--bone); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+.menu-card { background: transparent; border: 0; border-bottom: 1px dashed rgba(20,17,15,.28); border-radius: 0; box-shadow: none; overflow: hidden; }
 .menu-thumb { position: relative; flex: 0 0 116px; padding: 8px; }
 .menu-img { display: block; width: 100%; min-height: 0; height: auto; aspect-ratio: 1 / 1; }
 .menu-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; padding: .75rem .85rem .7rem .25rem; }
@@ -296,6 +295,9 @@ body.customer .site-footer-fab { padding-bottom: 6.5rem; }
 #cart-list .btn-link { color: var(--crimson) !important; font-weight: 600; min-height: 32px; text-decoration: none; }
 #cart-list .btn-link:hover { text-decoration: underline; }
 #note, #cust-name { min-height: 44px; }
+
+/* Daftar menu datar seperti buku menu (kartu top seller tetap berbingkai) */
+body.customer main.paper-panel .menu-card:not(.top-card) { background: transparent; border: 0; border-bottom: 1px dashed rgba(20,17,15,.28); box-shadow: none; border-radius: 0; }
 
 /* Konfirmasi */
 body.customer main.paper-panel .card { background: var(--bone); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--orange-d); }

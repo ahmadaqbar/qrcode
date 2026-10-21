@@ -44,3 +44,6 @@ Notifikasi suara: klik **AKTIFKAN** sekali saat membuka dashboard (aturan autopl
 ## Tambahan setelah tahap 4
 - **Footer "Copyright © <tahun> IT Division"** di halaman Login, seluruh halaman Staff/Admin, dan semua halaman Customer (menu, pesanan, konfirmasi, sukses). Pada halaman menu, footer diberi ruang agar tidak tertutup tombol *Lihat Pesanan*; tidak ikut tercetak.
 - **Icon kategori = upload file `.ico` atau `.png`** (`/admin/categories.php`), bukan lagi dropdown template. Validasi ekstensi + MIME asli + ukuran (maks 512KB) + dimensi (maks 1024x1024); nama file diacak, disimpan di `assets/uploads/categories/`. Icon dapat diganti atau dihapus; file lama ikut dibersihkan. Kategori tanpa icon (atau data lama berformat `bi-*`) tetap tampil dengan ikon bawaan.
+
+## Tema visual "African Ethnic / Batik Tribal"
+Tampilan seluruh sistem (customer, staff/admin, login, QR) memakai tema etnik bergaya buku menu cafe: pola tribal, bingkai foto, kertas krem, font lokal (Alfa Slab One + Poppins), tanpa CDN. Hanya mengubah tampilan — logika, database, dan URL tidak berubah. Detail palet, aset opsional (logo, latar), pengaturan `price_note`, dan cara rollback: [docs/THEME.md](docs/THEME.md).
