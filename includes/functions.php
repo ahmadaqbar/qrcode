@@ -13,16 +13,13 @@ ini_set('log_errors', '1');
 
 const ORDER_STATUSES = ['NEW', 'PROCESSING', 'COMPLETED', 'CANCELLED'];
 const STATUS_LABELS = [
-    'DRAFT'      => 'Ditahan (Hold)',
     'NEW'        => 'Pesanan Baru',
     'PROCESSING' => 'Diproses',
     'COMPLETED'  => 'Selesai',
     'CANCELLED'  => 'Dibatalkan',
 ];
 // Transisi status yang diizinkan: NEW -> PROCESSING -> COMPLETED, atau NEW -> CANCELLED
-// DRAFT (transaksi POS yang di-hold) hanya diubah lewat POS.
 const STATUS_TRANSITIONS = [
-    'DRAFT'      => [],
     'NEW'        => ['PROCESSING', 'CANCELLED'],
     'PROCESSING' => ['COMPLETED'],
     'COMPLETED'  => [],
@@ -104,9 +101,8 @@ function fetch_items_for_orders(array $orderIds): array
         return [];
     }
     $in = implode(',', array_fill(0, count($orderIds), '?'));
-    // Item yang dibatalkan (void) tidak ditampilkan & tidak dihitung
-    $st = db()->prepare("SELECT order_id, product_name, price, quantity, subtotal, note, kitchen_status
-                         FROM order_items WHERE order_id IN ($in) AND kitchen_status <> 'CANCELLED' ORDER BY id");
+    $st = db()->prepare("SELECT order_id, product_name, price, quantity, subtotal, note
+                         FROM order_items WHERE order_id IN ($in) ORDER BY id");
     $st->execute(array_values($orderIds));
     $out = [];
     foreach ($st->fetchAll() as $r) {
@@ -122,12 +118,6 @@ function format_order(array $o, array $items): array
         'id'            => (int) $o['id'],
         'order_number'  => $o['order_number'],
         'table_number'  => $o['table_number'],
-        'order_type'    => isset($o['order_type']) ? $o['order_type'] : 'DINE_IN',
-        'source'        => isset($o['source']) ? $o['source'] : 'QR',
-        'place_label'   => (!isset($o['order_type']) || $o['order_type'] === 'DINE_IN')
-                            ? ($o['table_number'] !== null ? 'Meja ' . $o['table_number'] : 'Dine-in')
-                            : ($o['order_type'] === 'TAKEAWAY' ? 'Takeaway' : 'Delivery'),
-        'payment_status' => isset($o['payment_status']) ? $o['payment_status'] : 'UNPAID',
         'customer_name' => $o['customer_name'],
         'note'          => $o['note'],
         'total'         => (int) $o['total'],

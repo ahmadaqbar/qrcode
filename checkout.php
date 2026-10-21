@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/orders.php';
+require_once __DIR__ . '/includes/functions.php';
 
 $number = isset($_GET['table']) ? trim((string) $_GET['table']) : '';
 try {
@@ -15,13 +15,7 @@ if (!$table) {
 $page_title = 'Konfirmasi Pesanan';
 $base = '';
 $page = 'checkout';
-$rates = ['service_rate' => 0, 'tax_rate' => 0, 'tax_include_service' => 1];
-try {
-    $rates = pricing_snapshot('DINE_IN');
-} catch (Throwable $ex) {
-    error_log($ex->getMessage());
-}
-$body_attrs = ['table' => $table['table_number'], 'service-rate' => $rates['service_rate'], 'tax-rate' => $rates['tax_rate'], 'tax-inc' => $rates['tax_include_service']];
+$body_attrs = ['table' => $table['table_number']];
 include __DIR__ . '/includes/header.php';
 ?>
 <header class="cust-header sticky-top">
@@ -43,12 +37,6 @@ include __DIR__ . '/includes/header.php';
     <div id="c-items"></div>
     <div id="row-note" class="d-none mt-3"><div class="small text-muted">Catatan</div><div id="c-note" class="text-break"></div></div>
     <hr>
-    <div id="c-breakdown" class="d-none small">
-      <div class="d-flex justify-content-between"><span>Subtotal</span><span id="c-subtotal"></span></div>
-      <div class="d-flex justify-content-between" id="row-service"><span>Service charge (<span id="c-srate"></span>%)</span><span id="c-service"></span></div>
-      <div class="d-flex justify-content-between" id="row-tax"><span>Pajak (<span id="c-trate"></span>%)</span><span id="c-tax"></span></div>
-      <hr class="my-2">
-    </div>
     <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span id="c-total">Rp0</span></div>
   </div></div>
 

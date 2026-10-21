@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_permission('dashboard.view');
+require_login();
 
 $page_title = 'Dashboard';
 $base = '../';

@@ -322,16 +322,7 @@
       r.appendChild(el('span', 'text-muted', rupiah(it.qty * it.price)));
       box.appendChild(r);
     });
-    // Rincian sama dengan server (includes/orders.php compute_totals); server tetap yang menentukan total akhir
-    var sr = parseFloat(body.getAttribute('data-service-rate')) || 0, tr = parseFloat(body.getAttribute('data-tax-rate')) || 0;
-    var sub = Cart.total(), svc = Math.round(sub * sr / 100), tax = Math.round((sub + (body.getAttribute('data-tax-inc') === '1' ? svc : 0)) * tr / 100);
-    if (sr > 0 || tr > 0) {
-      $('#c-breakdown').classList.remove('d-none');
-      $('#c-subtotal').textContent = rupiah(sub);
-      $('#c-srate').textContent = sr; $('#c-service').textContent = rupiah(svc); $('#row-service').classList.toggle('d-none', sr <= 0);
-      $('#c-trate').textContent = tr; $('#c-tax').textContent = rupiah(tax); $('#row-tax').classList.toggle('d-none', tr <= 0);
-    }
-    $('#c-total').textContent = rupiah(sub + svc + tax);
+    $('#c-total').textContent = rupiah(Cart.total());
     if (d.note) { $('#c-note').textContent = d.note; $('#row-note').classList.remove('d-none'); }
     if (d.name) { $('#c-name').textContent = d.name; $('#row-name').classList.remove('d-none'); }
 
@@ -518,7 +509,7 @@
       var wrap = el('div', 'd-flex');
       var b = el('div', 'toast-body');
       b.appendChild(el('div', 'fw-bold', '🔔 PESANAN BARU'));
-      b.appendChild(el('div', '', o.place_label));
+      b.appendChild(el('div', '', 'Meja ' + o.table_number));
       b.appendChild(el('div', '', o.order_number));
       b.appendChild(el('div', '', o.item_count + ' Item'));
       var x = el('button', 'btn-close btn-close-white me-2 m-auto'); x.type = 'button';
@@ -533,7 +524,7 @@
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
       try {
         new Notification('🔔 PESANAN BARU', {
-          body: o.place_label + '\n' + o.order_number + '\n' + o.item_count + ' Item',
+          body: 'Meja ' + o.table_number + '\n' + o.order_number + '\n' + o.item_count + ' Item',
           tag: o.order_number
         });
       } catch (e) { /* beberapa browser mobile butuh service worker */ }
@@ -550,7 +541,7 @@
       var head = el('div', 'd-flex justify-content-between align-items-start mb-2');
       var l = el('div');
       l.appendChild(el('div', 'fw-bold fs-5', o.order_number));
-      l.appendChild(el('div', 'text-muted', o.place_label + (o.source === 'POS' ? ' \u00B7 POS' : '')));
+      l.appendChild(el('div', 'text-muted', 'Meja ' + o.table_number));
       head.appendChild(l);
       head.appendChild(el('span', 'badge text-bg-light border', o.time));
       b.appendChild(head);
@@ -570,10 +561,6 @@
       if (o.status === 'NEW') {
         acts.appendChild(actionBtn('btn btn-success btn-lg', 'TERIMA PESANAN', o.id, 'PROCESSING'));
         acts.appendChild(actionBtn('btn btn-outline-danger btn-sm', 'Batalkan', o.id, 'CANCELLED', 'Batalkan pesanan ' + o.order_number + '?'));
-      } else if (o.payment_status !== 'PAID') {
-        // Pesanan ditutup lewat pembayaran di POS (status dapur bukan status pembayaran)
-        var pay = el('a', 'btn btn-primary btn-lg', 'BAYAR DI KASIR'); pay.href = 'pos.php?order=' + o.id;
-        acts.appendChild(pay);
       } else {
         acts.appendChild(actionBtn('btn btn-primary btn-lg', 'SELESAIKAN PESANAN', o.id, 'COMPLETED'));
       }

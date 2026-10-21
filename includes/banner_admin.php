@@ -6,7 +6,7 @@
  */
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/upload.php';
-require_permission('catalog.manage');
+require_login();
 
 $pdo = db();
 $T = $cfg['table'];

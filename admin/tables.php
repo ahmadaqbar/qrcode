@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_permission('tables.manage');
+require_login();
 
 $pdo = db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

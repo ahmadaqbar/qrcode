@@ -27,37 +27,13 @@ $admin = !empty($admin);
 $admin_shell = $admin && is_logged_in();
 if ($admin_shell):
     $cur = basename($_SERVER['SCRIPT_NAME']);
-    $alias = ['order-detail.php' => 'orders.php', 'shift-report.php' => 'shift.php', 'roles.php' => 'users.php'];
-    if (isset($alias[$cur])) { $cur = $alias[$cur]; }
-    // [file, label, icon, izin]; null = pemisah. Menu hanya tampil bila izin ada & halamannya tersedia.
-    $navAll = [
-        ['dashboard.php', 'Dashboard', 'bi-speedometer2', 'dashboard.view'], null,
-        ['pos.php', 'POS Kasir', 'bi-calculator', 'pos.use'],
-        ['floor.php', 'Meja (Denah)', 'bi-grid-1x2', 'pos.use'],
-        ['orders.php', 'Orders', 'bi-receipt', 'orders.view'],
-        ['kitchen.php', 'Kitchen', 'bi-fire', 'kitchen.view'],
-        ['delivery.php', 'Delivery', 'bi-bicycle', ['delivery.view', 'delivery.courier']],
-        ['shift.php', 'Shift Kasir', 'bi-cash-stack', ['shift.manage', 'shift.override']], null,
-        ['tables.php', 'Tables', 'bi-grid-3x3-gap', 'tables.manage'], ['categories.php', 'Categories', 'bi-tags', 'catalog.manage'],
-        ['products.php', 'Products', 'bi-box-seam', 'catalog.manage'], ['inventory.php', 'Inventory', 'bi-boxes', 'inventory.manage'], null,
-        ['top-sellers.php', 'Top Seller', 'bi-star', 'catalog.manage'], ['promos.php', 'Promo Banner', 'bi-megaphone', 'catalog.manage'],
-        ['flyers.php', 'New Menu Flyer', 'bi-image', 'catalog.manage'], null,
-        ['reports.php', 'Reports', 'bi-graph-up', 'reports.view'], null,
-        ['qr.php', 'QR Code', 'bi-qr-code', 'tables.manage'], ['settings.php', 'Settings', 'bi-gear', 'settings.manage'],
-        ['users.php', 'Users & Roles', 'bi-people', 'users.manage'], ['accurate.php', 'Integrasi Accurate', 'bi-arrow-left-right', 'integration.manage'],
-        ['audit.php', 'Audit Log', 'bi-journal-text', 'audit.view'], null,
-        ['account.php', 'Akun Saya', 'bi-person-circle', null],
+    if ($cur === 'order-detail.php') { $cur = 'orders.php'; }
+    $nav = [
+        ['dashboard.php', 'Dashboard', 'bi-speedometer2'], null,
+        ['orders.php', 'Orders', 'bi-receipt'], ['tables.php', 'Tables', 'bi-grid-3x3-gap'], ['categories.php', 'Categories', 'bi-tags'], ['products.php', 'Products', 'bi-box-seam'], null,
+        ['top-sellers.php', 'Top Seller', 'bi-star'], ['promos.php', 'Promo Banner', 'bi-megaphone'], ['flyers.php', 'New Menu Flyer', 'bi-image'], null,
+        ['qr.php', 'QR Code', 'bi-qr-code'], ['account.php', 'Settings', 'bi-gear'],
     ];
-    $nav = [];
-    foreach ($navAll as $n) {
-        if ($n === null) {
-            if ($nav && end($nav) !== null) { $nav[] = null; }
-        } elseif (($n[3] === null || can($n[3])) && is_file(ROOT_PATH . '/admin/' . $n[0])) {
-            $nav[] = $n;
-        }
-    }
-    while ($nav && end($nav) === null) { array_pop($nav); }
-    $me = current_user();
 ?>
 <div class="admin-shell">
   <nav class="navbar navbar-dark bg-dark d-lg-none px-3">
@@ -71,7 +47,7 @@ if ($admin_shell):
     </div>
     <div class="offcanvas-body flex-column p-0">
       <div class="side-top d-none d-lg-flex">
-        <a class="side-brand side-text" href="<?= e(home_page()) ?>"><?= e(APP_NAME) ?></a>
+        <a class="side-brand side-text" href="dashboard.php"><?= e(APP_NAME) ?></a>
         <button type="button" class="side-toggle" id="sidebar-toggle" aria-label="Ciutkan / lebarkan menu" aria-expanded="true" title="Menu">&#9776;</button>
       </div>
       <ul class="nav flex-column side-nav">
@@ -81,7 +57,6 @@ if ($admin_shell):
           <li><a class="side-link<?= $cur === $n[0] ? ' active' : '' ?>" href="<?= e($n[0]) ?>" title="<?= e($n[1]) ?>"><i class="bi <?= e($n[2]) ?>" aria-hidden="true"></i><span class="side-text"><?= e($n[1]) ?></span></a></li>
         <?php endif; endforeach; ?>
         <li class="side-sep" role="separator"></li>
-        <li class="side-user side-text" title="<?= e($me['role_name']) ?>"><?= e($me['name']) ?><small><?= e($me['role_name']) ?></small></li>
         <li>
           <form method="post" action="logout.php" class="m-0"><?= csrf_field() ?>
             <button class="side-link w-100 text-start" title="Logout"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span class="side-text">Logout</span></button></form>
