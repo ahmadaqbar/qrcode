@@ -19,13 +19,16 @@ $body_attrs = ['table' => $table['table_number']];
 include __DIR__ . '/includes/header.php';
 ?>
 <header class="cust-header sticky-top">
-  <div class="container d-flex align-items-center">
-    <a href="cart.php?table=<?= e($table['table_number']) ?>" class="btn btn-sm btn-light me-2">&larr;</a>
-    <div class="fw-semibold">Konfirmasi Pesanan</div>
+  <div class="container">
+    <div class="cust-brand">
+      <a href="cart.php?table=<?= e($table['table_number']) ?>" class="btn btn-light btn-back" aria-label="Kembali">&larr;</a>
+      <div class="cust-name">Konfirmasi Pesanan</div>
+      <span class="stamp table-stamp">Meja <?= e($table['table_number']) ?></span>
+    </div>
   </div>
 </header>
 
-<main class="container py-3 has-cartbar">
+<main class="container py-3 has-cartbar paper-panel">
   <div class="card mb-3"><div class="card-body">
     <div class="small text-muted">Meja</div>
     <div class="fw-semibold fs-5"><?= e($table['table_number']) ?></div>
@@ -41,6 +44,7 @@ include __DIR__ . '/includes/header.php';
   </div></div>
 
   <div id="c-error" class="alert alert-danger d-none"></div>
+  <?php if (($note = price_note_text()) !== ''): ?><p class="price-note"><?= e($note) ?></p><?php endif; ?>
 </main>
 
 <div class="cart-bar static-bar">

@@ -25,8 +25,8 @@ $page = 'success';
 $body_attrs = ['table' => $order['table_number'], 'token' => $token, 'status' => $order['status']];
 include __DIR__ . '/includes/header.php';
 ?>
-<main class="container py-5 text-center" style="max-width:480px">
-  <div class="success-icon mb-3">&#10003;</div>
+<main class="container py-5 text-center paper-panel panel-lone" style="max-width:480px">
+  <img class="success-orn mb-2" src="assets/images/theme/ornament-success.svg" width="110" height="110" alt="">
   <h1 class="h3 fw-bold">PESANAN BERHASIL</h1>
   <p class="text-muted">Pesanan Anda telah diterima.</p>
   <div class="card text-start mt-4"><div class="card-body">
@@ -35,7 +35,7 @@ include __DIR__ . '/includes/header.php';
     <div class="small text-muted">Meja</div>
     <div class="fw-semibold mb-2"><?= e($order['table_number']) ?></div>
     <div class="small text-muted">Status</div>
-    <div class="fw-semibold" id="order-status"><?= e(status_label($order['status'])) ?></div>
+    <span class="status-badge" id="order-status" data-status="<?= e($order['status']) ?>"><?= e(status_label($order['status'])) ?></span>
   </div></div>
   <p class="mt-4" id="wait-msg">Mohon menunggu.</p>
   <a href="order.php?table=<?= e($order['table_number']) ?>" class="btn btn-outline-dark mt-2">Pesan Lagi</a>

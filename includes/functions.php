@@ -76,7 +76,7 @@ function fail_page(string $message, int $code = 400): void
     $page_title = 'Terjadi Kesalahan';
     $base = '';
     include ROOT_PATH . '/includes/header.php';
-    echo '<div class="container py-5 text-center"><h1 class="h4 mb-3">' . e($message) . '</h1>'
+    echo '<div class="container py-5 text-center paper-panel panel-lone" style="max-width:480px"><h1 class="h4 mb-2">' . e($message) . '</h1><div class="ornament-rule" role="presentation"></div>'
        . '<p class="text-muted">Silakan scan ulang QR Code di meja Anda.</p></div>';
     include ROOT_PATH . '/includes/footer.php';
     exit;
@@ -325,4 +325,53 @@ function category_icon_html($icon, string $base = '', string $cls = ''): string
     }
     $bi = is_string($icon) && preg_match('/^bi-[a-z0-9-]{2,40}$/', $icon) ? $icon : 'bi-grid';
     return '<i class="bi ' . e($bi) . ' ' . e($cls) . '" aria-hidden="true"></i>';
+}
+
+/* ---------- Tema (tampilan saja) ---------- */
+
+/**
+ * Harga ringkas ala menu cetak: 17500 -> "17,5 K", 25000 -> "25 K". Di bawah 1.000 tetap Rupiah penuh.
+ * HANYA tampilan; nilai harga di DB/server tidak berubah. Teks Rupiah lengkap disertakan untuk pembaca layar.
+ */
+function price_short_html($n): string
+{
+    $n = (int) $n;
+    $full = rupiah($n);
+    if ($n < 1000) {
+        return '<span class="price-short">' . e($full) . '</span>';
+    }
+    $k = rtrim(rtrim(number_format($n / 1000, 3, ',', ''), '0'), ',');
+    return '<span class="price-short"><span class="visually-hidden">' . e($full) . '</span><span aria-hidden="true">'
+         . e($k) . '<b>K</b></span></span>';
+}
+
+/** Catatan harga di halaman menu & pesanan. Ubah lewat tabel settings (key: price_note); nilai kosong = disembunyikan. */
+function price_note_text(): string
+{
+    $default = '*Harga belum termasuk pajak & service';
+    try {
+        $v = get_setting('price_note', "\x00");
+        return $v === "\x00" ? $default : $v;
+    } catch (Throwable $ex) {
+        return $default;
+    }
+}
+
+/** Logo restoran opsional: taruh file assets/images/theme/logo.(svg|png|webp). Return path relatif assets/ atau null. */
+function theme_logo(): ?string
+{
+    foreach (['svg', 'png', 'webp'] as $ext) {
+        if (is_file(ROOT_PATH . '/assets/images/theme/logo.' . $ext)) {
+            return 'images/theme/logo.' . $ext;
+        }
+    }
+    return null;
+}
+
+
+/** Versi aset berdasarkan waktu ubah file, supaya browser tidak memakai CSS/JS lama dari cache. */
+function asset_ver(string $path): string
+{
+    $f = __DIR__ . '/../' . $path;
+    return is_file($f) ? (string) filemtime($f) : '1';
 }

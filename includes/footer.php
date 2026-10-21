@@ -12,6 +12,6 @@ $footerFab = in_array(isset($page) ? $page : '', ['menu', 'cart', 'checkout'], t
 <?php if (!empty($extra_scripts)): foreach ($extra_scripts as $s): ?>
 <script src="<?= $base . e($s) ?>"></script>
 <?php endforeach; endif; ?>
-<script src="<?= $base ?>assets/js/app.js"></script>
+<script src="<?= $base ?>assets/js/app.js?v=<?= asset_ver('assets/js/app.js') ?>"></script>
 </body>
 </html>

@@ -111,6 +111,7 @@
         $all('.menu-item').forEach(function (m) {
           m.classList.toggle('d-none', cat !== 'all' && m.getAttribute('data-cat') !== cat);
         });
+        $all('.menu-cat-head').forEach(function (h) { h.classList.toggle('d-none', cat !== 'all' && h.getAttribute('data-cat') !== cat); });
         var menu = $('#menu');
         if (menu && menu.scrollIntoView) menu.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
@@ -119,6 +120,17 @@
     refresh();
     initFlyer();
     initOpenProduct(PD);
+    initReveal();
+  }
+
+  /* Fade-in halus saat kartu masuk layar (tema). Tanpa IntersectionObserver: tampil biasa. */
+  function initReveal() {
+    var items = $all('.reveal');
+    if (!('IntersectionObserver' in window)) { items.forEach(function (i) { i.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -5% 0px' });
+    items.forEach(function (i) { io.observe(i); });
   }
 
   /* Daftar id produk sesuai konteks klik: top seller / menu yang sedang tampil / tunggal (promo, flyer). */
@@ -403,6 +415,7 @@
           if (j.ok) {
             last = j.status;
             $('#order-status').textContent = j.status_label;
+            $('#order-status').setAttribute('data-status', j.status);
             $('#wait-msg').textContent = msgs[j.status] || '';
           }
         })
