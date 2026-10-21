@@ -17,6 +17,9 @@ $admin = !empty($admin);
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/css/style.css">
+  <link rel="stylesheet" href="<?= $base ?>assets/css/theme-african.css">
+  <link rel="preload" href="<?= $base ?>assets/fonts/alfa-slab-one-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="<?= $base ?>assets/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <?php if ($admin): ?>
   <script>try { if (localStorage.getItem('admin_sidebar_collapsed') === '1') document.documentElement.classList.add('sb-collapsed'); } catch (e) {}</script>
 <?php endif; ?>

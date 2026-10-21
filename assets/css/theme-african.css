@@ -1,0 +1,167 @@
+/* =====================================================================
+   THEME "African Ethnic / Batik Tribal"  — satu sumber kebenaran tampilan
+   Dimuat SETELAH vendor/bootstrap dan css/style.css; hanya mengubah tampilan.
+   Aset: ../fonts (woff2 lokal), ../images/theme (SVG, dibuat oleh tools/gen-theme-patterns.py)
+   ===================================================================== */
+
+/* ---------- Font (lokal, latin subset, font-display: swap) ---------- */
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/poppins-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/poppins-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 800; font-display: swap; src: url("../fonts/poppins-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Alfa Slab One"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/alfa-slab-one-latin-400-normal.woff2") format("woff2"); }
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* palet */
+  --ink: #14110F;  --navy: #0F1B2D;
+  --orange: #E8861B;  --orange-d: #D9741A;  --orange-dd: #A85A10;
+  --mustard: #F2B33D;
+  --teal: #1E8A8F;  --teal-d: #17757A;
+  --blue: #1F4E8C;
+  --crimson: #B5242F;
+  --paper: #FBF6EC;  --paper-2: #F6EFE2;  --bone: #FFFDF8;
+  --line: #E2D4B9;
+  --text: #2A211A;  --muted: #6B5B4B;
+  /* tipografi */
+  --font-body: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-head: "Alfa Slab One", Rockwell, "Rockwell Extra Bold", Georgia, "Times New Roman", serif;
+  /* bentuk & bayangan */
+  --radius: 14px;  --radius-sm: 10px;
+  --shadow-sm: 0 1px 0 rgba(20,17,15,.06), 0 2px 6px rgba(20,17,15,.10);
+  --shadow: 0 2px 0 rgba(20,17,15,.08), 0 8px 20px rgba(20,17,15,.14);
+  /* spasi */
+  --space-1: .25rem; --space-2: .5rem; --space-3: 1rem; --space-4: 1.5rem; --space-5: 3rem;
+  /* aset pola (relatif terhadap file CSS ini) */
+  --img-tribal: url("../images/theme/pattern-tribal.svg");
+  --img-tribal-soft: url("../images/theme/pattern-tribal-soft.svg");
+  --img-paper: url("../images/theme/paper.svg");
+  --img-zigzag: url("../images/theme/divider-zigzag.svg");
+  --img-ornament: url("../images/theme/divider-ornament.svg");
+  --img-frame: url("../images/theme/frame-border.svg");
+  --img-stamp: url("../images/theme/stamp-ring.svg");
+  /* peta ke variabel yang sudah dipakai style.css & Bootstrap */
+  --accent: var(--orange-d);
+  --brand: var(--ink);
+  --bs-body-font-family: var(--font-body);
+  --bs-body-color: var(--text);
+  --bs-body-bg: var(--paper-2);
+  --bs-border-color: var(--line);
+  --bs-link-color: var(--blue);  --bs-link-hover-color: var(--orange-dd);
+  --bs-primary: var(--blue);  --bs-primary-rgb: 31, 78, 140;
+  --bs-success-rgb: 23, 117, 122;
+  --bs-danger-rgb: 181, 36, 47;
+  --bs-warning-rgb: 242, 179, 61;
+  --bs-info-rgb: 31, 78, 140;
+  --bs-dark-rgb: 20, 17, 15;
+  --bs-secondary-color: var(--muted);
+}
+
+/* ---------- Dasar ---------- */
+body { font-family: var(--font-body); color: var(--text); background-color: var(--paper-2); -webkit-font-smoothing: antialiased; }
+h1, .h1, h2, .h2 { font-family: var(--font-head); font-weight: 400; letter-spacing: .02em; line-height: 1.2; }
+h3, h4, h5, h6, .h3, .h4, .h5, .h6 { font-weight: 600; }
+.font-head { font-family: var(--font-head); font-weight: 400; letter-spacing: .03em; }
+.text-muted, .text-body-secondary { color: var(--muted) !important; }
+a { text-underline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--mustard); outline-offset: 2px; }
+.btn:focus-visible, .form-control:focus-visible, .form-select:focus-visible { outline-offset: 1px; }
+::selection { background: var(--mustard); color: var(--ink); }
+
+/* ---------- Tombol ---------- */
+.btn { --bs-btn-font-weight: 600; border-radius: var(--radius-sm); transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease; }
+.btn:active:not(:disabled) { transform: scale(.97); }
+.btn-dark, .btn-accent {   /* aksi utama = oranye terbakar, teks gelap (kontras AA) */
+  --bs-btn-color: var(--ink); --bs-btn-bg: var(--orange-d); --bs-btn-border-color: var(--ink);
+  --bs-btn-hover-color: var(--ink); --bs-btn-hover-bg: var(--orange); --bs-btn-hover-border-color: var(--ink);
+  --bs-btn-active-color: var(--ink); --bs-btn-active-bg: var(--orange-dd); --bs-btn-active-border-color: var(--ink);
+  --bs-btn-disabled-color: #5b5148; --bs-btn-disabled-bg: #d8ccb6; --bs-btn-disabled-border-color: #bfae92;
+  color: var(--ink); background-color: var(--orange-d); border-color: var(--ink); font-weight: 600; box-shadow: 0 2px 0 var(--ink);
+}
+.btn-dark:hover:not(:disabled), .btn-accent:hover:not(:disabled), .btn-dark:focus, .btn-accent:focus { color: var(--ink); background-color: var(--orange); border-color: var(--ink); }
+.btn-dark:active:not(:disabled), .btn-accent:active:not(:disabled) { box-shadow: 0 0 0 var(--ink); transform: translateY(2px); }
+.btn-dark:disabled, .btn-accent:disabled { color: #5b5148; background-color: #d8ccb6; border-color: #bfae92; box-shadow: none; opacity: 1; }
+.btn-outline-dark { --bs-btn-color: var(--ink); --bs-btn-border-color: var(--ink); --bs-btn-hover-bg: var(--ink); --bs-btn-hover-color: var(--paper); --bs-btn-hover-border-color: var(--ink);
+  --bs-btn-active-bg: var(--ink); --bs-btn-active-color: var(--paper); --bs-btn-active-border-color: var(--ink); }
+.btn-outline-secondary { --bs-btn-color: var(--muted); --bs-btn-border-color: #b9a98d; --bs-btn-hover-bg: var(--muted); --bs-btn-hover-border-color: var(--muted); }
+.btn-outline-primary { --bs-btn-color: var(--blue); --bs-btn-border-color: var(--blue); --bs-btn-hover-bg: var(--blue); --bs-btn-hover-border-color: var(--blue); }
+.btn-outline-danger { --bs-btn-color: var(--crimson); --bs-btn-border-color: var(--crimson); --bs-btn-hover-bg: var(--crimson); --bs-btn-hover-border-color: var(--crimson); }
+.btn-primary { --bs-btn-bg: var(--blue); --bs-btn-border-color: var(--blue); --bs-btn-hover-bg: #173d6e; --bs-btn-hover-border-color: #173d6e; --bs-btn-active-bg: #173d6e; }
+.btn-success { --bs-btn-bg: var(--teal-d); --bs-btn-border-color: var(--teal-d); --bs-btn-hover-bg: #105a5e; --bs-btn-hover-border-color: #105a5e; --bs-btn-active-bg: #105a5e; }
+.btn-danger { --bs-btn-bg: var(--crimson); --bs-btn-border-color: var(--crimson); --bs-btn-hover-bg: #8f1b25; --bs-btn-hover-border-color: #8f1b25; }
+.btn-warning { --bs-btn-bg: var(--mustard); --bs-btn-border-color: var(--mustard); --bs-btn-color: var(--ink); --bs-btn-hover-bg: #f6c25f; --bs-btn-hover-border-color: #f6c25f; --bs-btn-hover-color: var(--ink); }
+.btn-light { --bs-btn-bg: var(--bone); --bs-btn-border-color: var(--line); --bs-btn-hover-bg: #fff; }
+.btn-close:focus { box-shadow: 0 0 0 .2rem rgba(242,179,61,.6); }
+
+/* ---------- Kartu, badge, form, tabel, alert, modal ---------- */
+.card { --bs-card-bg: var(--bone); --bs-card-border-color: var(--line); --bs-card-border-radius: var(--radius); --bs-card-cap-bg: var(--paper); border-radius: var(--radius); }
+.list-group { --bs-list-group-bg: var(--bone); --bs-list-group-border-color: var(--line); --bs-list-group-border-radius: var(--radius); }
+.badge { font-weight: 600; letter-spacing: .02em; }
+.text-bg-info { color: #fff !important; }
+.text-bg-light { background-color: var(--paper) !important; color: var(--text) !important; }
+.form-control, .form-select { background-color: #fff; border-color: #cdbb9c; border-radius: var(--radius-sm); }
+.form-control:focus, .form-select:focus { border-color: var(--orange-d); box-shadow: 0 0 0 .22rem rgba(242,179,61,.45); background-color: #fff; }
+.form-label { font-weight: 600; color: var(--text); }
+.form-check-input:checked { background-color: var(--teal-d); border-color: var(--teal-d); }
+.form-check-input:focus { border-color: var(--orange-d); box-shadow: 0 0 0 .2rem rgba(242,179,61,.45); }
+.input-group-text { background: var(--paper); border-color: #cdbb9c; }
+.table { --bs-table-color: var(--text); --bs-table-border-color: var(--line); --bs-table-hover-bg: rgba(242,179,61,.14); --bs-table-striped-bg: rgba(242,179,61,.07); }
+.table > thead > tr > th { font-family: var(--font-body); font-weight: 600; color: var(--ink); border-bottom: 2px solid var(--ink); background: var(--paper); white-space: nowrap; }
+.table.bg-white, .bg-white { background-color: var(--bone) !important; }
+.alert { --bs-alert-border-radius: var(--radius-sm); border-left-width: 6px; }
+.alert-success { --bs-alert-bg: #e3f3f1; --bs-alert-border-color: #9bcfca; --bs-alert-color: #0e4a4d; border-left-color: var(--teal-d); }
+.alert-danger { --bs-alert-bg: #f9e3e4; --bs-alert-border-color: #e6a8ad; --bs-alert-color: #6f141c; border-left-color: var(--crimson); }
+.alert-warning { --bs-alert-bg: #fdf1d4; --bs-alert-border-color: #f0cf85; --bs-alert-color: #6a4a07; border-left-color: var(--mustard); }
+.alert-info, .alert-secondary { --bs-alert-bg: #e8eef7; --bs-alert-border-color: #b5c6de; --bs-alert-color: #1a3a66; border-left-color: var(--blue); }
+.modal { --bs-modal-bg: var(--paper); --bs-modal-border-color: var(--ink); --bs-modal-border-radius: var(--radius); --bs-modal-header-border-color: var(--line); --bs-modal-footer-border-color: var(--line); }
+.modal-title { font-family: var(--font-head); font-weight: 400; }
+.offcanvas { --bs-offcanvas-bg: var(--paper); }
+.toast { --bs-toast-border-radius: var(--radius-sm); }
+.dropdown-menu { --bs-dropdown-bg: var(--bone); --bs-dropdown-border-color: var(--line); --bs-dropdown-link-active-bg: var(--orange-d); }
+.progress, .pagination { --bs-pagination-active-bg: var(--orange-d); --bs-pagination-active-border-color: var(--orange-d); }
+
+/* =====================================================================
+   KOMPONEN TEMA (dipakai ulang di customer & admin)
+   ===================================================================== */
+
+/* Bingkai foto etnik: border merah bertitik + pita segitiga/belah ketupat */
+.ethnic-frame { --frame-w: 12px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; box-sizing: border-box; background-color: var(--ink); }
+.ethnic-frame-sm { --frame-w: 8px; }
+.ethnic-frame-lg { --frame-w: 18px; }
+
+/* Panel kertas krem: noise halus + halftone memudar di kiri/bawah */
+.paper-panel { position: relative; isolation: isolate; background-color: var(--paper); background-image: var(--img-paper); color: var(--text); }
+.paper-panel::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(20,17,15,.20) 1.1px, transparent 1.6px); background-size: 8px 8px;
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 34%), linear-gradient(0deg, #000, transparent 22%);
+          mask-image: linear-gradient(90deg, #000, transparent 34%), linear-gradient(0deg, #000, transparent 22%); }
+.paper-panel::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 0; top: 0; bottom: 0; width: 16px;
+  background-image: var(--img-tribal-soft); background-size: 80px 80px; opacity: .55;
+  -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent); mask-image: linear-gradient(90deg, #000 30%, transparent); }
+
+/* Pemisah ornamen */
+.ornament-rule { height: 14px; background: var(--img-zigzag) repeat-x left center; border: 0; margin: 1rem 0; opacity: 1; }
+.ornament-thin { height: 14px; background: var(--img-ornament) repeat-x left center; }
+
+/* Judul section ala cetak: slab "stempel" + garis ornamen */
+.section-title { font-family: var(--font-head); font-weight: 400; font-size: 1.3rem; letter-spacing: .07em; color: var(--ink); text-transform: uppercase;
+  display: flex; align-items: center; gap: .6rem; margin: 0 0 .75rem; }
+.section-title::after { content: ""; flex: 1 1 auto; height: 14px; background: var(--img-ornament) repeat-x left center; }
+
+/* Lencana stempel */
+.stamp { display: inline-block; font-family: var(--font-head); letter-spacing: .08em; line-height: 1; padding: .3rem .65rem; border: 2px dashed var(--mustard);
+  border-radius: .45rem; color: var(--mustard); transform: rotate(-3deg); white-space: nowrap; }
+.stamp-solid { background: var(--mustard); color: var(--ink); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+
+/* Harga ringkas ala menu cetak: "17,5 K" */
+.price-short { font-weight: 800; color: var(--ink); white-space: nowrap; letter-spacing: -.01em; }
+.price-short b { font-weight: 800; color: var(--orange-dd); margin-left: .12em; }
+
+/* Animasi halus */
+@keyframes th-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.reveal { opacity: 0; }
+.reveal.in { animation: th-fade-up .28s ease-out forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; }
+}
