@@ -278,3 +278,55 @@ body.customer main.paper-panel, body.customer .paper-panel.container { max-width
 body.customer .site-footer { position: relative; margin-top: 0; padding-top: 1.6rem; color: var(--paper); background: var(--ink); border-top: 3px solid var(--mustard); }
 body.customer .site-footer::before { content: ""; position: absolute; left: 0; right: 0; top: -17px; height: 14px; background: var(--img-zigzag) repeat-x; }
 body.customer .site-footer-fab { padding-bottom: 6.5rem; }
+
+/* =====================================================================
+   FASE C — PESANAN, KONFIRMASI, SUKSES, BERANDA, HALAMAN ERROR
+   ===================================================================== */
+.btn-back { width: 44px; height: 44px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; flex: 0 0 auto; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.cust-header .cust-name { font-size: 1.15rem; }
+.panel-lone { margin-top: 12vh !important; border-bottom: 2px solid var(--ink) !important; border-radius: 18px !important; padding-left: 2rem !important; padding-right: 1.25rem !important; }
+.panel-lone h1 { color: var(--ink); }
+.panel-lone .ornament-rule { margin: .5rem 0 1rem; }
+
+/* Daftar pesanan (baris dibuat oleh app.js) */
+#cart-empty { color: var(--muted); }
+#cart-list { gap: .6rem; background: transparent; }
+#cart-list .list-group-item { background: var(--bone); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: .8rem .9rem; }
+#cart-list .list-group-item .fw-semibold { color: var(--ink); }
+#cart-list .btn-link { color: var(--crimson) !important; font-weight: 600; min-height: 32px; text-decoration: none; }
+#cart-list .btn-link:hover { text-decoration: underline; }
+#note, #cust-name { min-height: 44px; }
+
+/* Konfirmasi */
+body.customer main.paper-panel .card { background: var(--bone); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--orange-d); }
+body.customer main.paper-panel .card .small.text-muted { text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; }
+body.customer main.paper-panel hr { border-top: 2px dashed var(--line); opacity: 1; }
+#c-total { font-family: var(--font-head); font-weight: 400; font-size: 1.4rem; color: var(--ink); }
+
+/* Bar aksi bawah pada halaman pesanan/konfirmasi */
+.cart-bar { background: var(--ink); color: var(--paper); border-top: 3px solid var(--mustard); box-shadow: 0 -3px 0 var(--ink); }
+.cart-bar.static-bar { padding-top: .9rem; }
+.cart-bar .btn-light { color: var(--ink); background: var(--orange-d); border: 2px solid var(--paper); font-weight: 800; letter-spacing: .02em; min-height: 52px; box-shadow: 0 3px 0 rgba(0,0,0,.5); }
+.cart-bar .btn-light:hover, .cart-bar .btn-light:focus { background: var(--orange); color: var(--ink); }
+.cart-bar .btn-light:disabled { background: #d8ccb6; color: #5b5148; border-color: #bfae92; }
+.cart-bar #cart-total { font-family: var(--font-head); font-size: 1.15rem; color: var(--mustard); }
+
+/* Halaman sukses */
+.success-orn { filter: drop-shadow(0 4px 0 rgba(20,17,15,.25)); }
+.panel-lone .h3 { font-size: 1.6rem; }
+.status-badge { display: inline-block; padding: .3rem .8rem; border-radius: 999px; font-weight: 800; font-size: .95rem; letter-spacing: .03em; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: var(--mustard); color: var(--ink); transition: background-color .25s ease, color .25s ease; }
+.status-badge[data-status="PROCESSING"] { background: var(--blue); color: #fff; }
+.status-badge[data-status="COMPLETED"] { background: var(--teal-d); color: #fff; }
+.status-badge[data-status="CANCELLED"] { background: var(--crimson); color: #fff; }
+#wait-msg { font-weight: 600; color: var(--ink); }
+
+/* Halaman pendek: kertas memanjang sampai dasar layar, footer menempel di bawah */
+body.customer { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+body.customer main.has-cartbar { flex: 1 0 auto; }
+body.customer .site-footer { margin-top: auto; flex: 0 0 auto; }
+body.customer main.panel-lone, body.customer .panel-lone { flex: 0 0 auto; width: 100%; }
+body.customer .site-footer::before { display: none; }
+body.customer main.paper-panel + .site-footer, body.customer .panel-lone ~ .site-footer { margin-top: auto; }
+/* judul header yang panjang boleh turun baris alih-alih terpotong */
+.cust-brand .btn-back + .cust-name { white-space: normal; line-height: 1.1; font-size: 1.05rem; }
+@media (max-width: 380px) { .table-stamp { font-size: .8rem; padding: .25rem .5rem; } }

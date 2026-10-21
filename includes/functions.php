@@ -76,7 +76,7 @@ function fail_page(string $message, int $code = 400): void
     $page_title = 'Terjadi Kesalahan';
     $base = '';
     include ROOT_PATH . '/includes/header.php';
-    echo '<div class="container py-5 text-center"><h1 class="h4 mb-3">' . e($message) . '</h1>'
+    echo '<div class="container py-5 text-center paper-panel panel-lone" style="max-width:480px"><h1 class="h4 mb-2">' . e($message) . '</h1><div class="ornament-rule" role="presentation"></div>'
        . '<p class="text-muted">Silakan scan ulang QR Code di meja Anda.</p></div>';
     include ROOT_PATH . '/includes/footer.php';
     exit;

@@ -415,6 +415,7 @@
           if (j.ok) {
             last = j.status;
             $('#order-status').textContent = j.status_label;
+            $('#order-status').setAttribute('data-status', j.status);
             $('#wait-msg').textContent = msgs[j.status] || '';
           }
         })

@@ -19,16 +19,16 @@ $body_attrs = ['table' => $table['table_number']];
 include __DIR__ . '/includes/header.php';
 ?>
 <header class="cust-header sticky-top">
-  <div class="container d-flex align-items-center">
-    <a href="order.php?table=<?= e($table['table_number']) ?>" class="btn btn-sm btn-light me-2" id="back-link">&larr;</a>
-    <div>
-      <div class="fw-semibold" id="step-title">Daftar Pesanan</div>
-      <div class="small text-muted">Meja <?= e($table['table_number']) ?></div>
+  <div class="container">
+    <div class="cust-brand">
+      <a href="order.php?table=<?= e($table['table_number']) ?>" class="btn btn-light btn-back" id="back-link" aria-label="Kembali">&larr;</a>
+      <div class="cust-name" id="step-title">Daftar Pesanan</div>
+      <span class="stamp table-stamp">Meja <?= e($table['table_number']) ?></span>
     </div>
   </div>
 </header>
 
-<main class="container py-3 has-cartbar">
+<main class="container py-3 has-cartbar paper-panel">
   <!-- Langkah 1: daftar pesanan -->
   <section id="step-cart">
     <div id="cart-empty" class="text-center text-muted py-5 d-none">
@@ -46,6 +46,7 @@ include __DIR__ . '/includes/header.php';
     <label class="form-label fw-semibold" for="cust-name">Nama Customer <span class="text-muted fw-normal">(Opsional)</span></label>
     <input id="cust-name" class="form-control" maxlength="100" autocomplete="name">
   </section>
+  <?php if (($note = price_note_text()) !== ''): ?><p class="price-note"><?= e($note) ?></p><?php endif; ?>
 </main>
 
 <div class="cart-bar static-bar d-none" id="cart-footer">
