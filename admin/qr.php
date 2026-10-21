@@ -41,6 +41,7 @@ $root = site_url();
 $detected = app_base_url();
 
 $page_title = 'QR Meja';
+$body_class = 'qr-page';
 $base = '../';
 $admin = true;
 $page = 'qr';
