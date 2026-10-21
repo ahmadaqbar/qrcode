@@ -36,6 +36,7 @@
   --img-tribal-soft: url("../images/theme/pattern-tribal-soft.svg");
   --img-paper: url("../images/theme/paper.svg");
   --img-zigzag: url("../images/theme/divider-zigzag.svg");
+  --img-zigzag-v: url("../images/theme/divider-zigzag-v.svg");
   --img-ornament: url("../images/theme/divider-ornament.svg");
   --img-frame: url("../images/theme/frame-border.svg");
   --img-stamp: url("../images/theme/stamp-ring.svg");
@@ -134,9 +135,7 @@ a { text-underline-offset: 2px; }
   background-image: radial-gradient(circle, rgba(20,17,15,.20) 1.1px, transparent 1.6px); background-size: 8px 8px;
   -webkit-mask-image: linear-gradient(90deg, #000, transparent 34%), linear-gradient(0deg, #000, transparent 22%);
           mask-image: linear-gradient(90deg, #000, transparent 34%), linear-gradient(0deg, #000, transparent 22%); }
-.paper-panel::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 0; top: 0; bottom: 0; width: 16px;
-  background-image: var(--img-tribal-soft); background-size: 80px 80px; opacity: .55;
-  -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent); mask-image: linear-gradient(90deg, #000 30%, transparent); }
+.paper-panel::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 0; top: 0; bottom: 0; width: 14px; background: var(--img-zigzag-v) repeat-y left top; }
 
 /* Pemisah ornamen */
 .ornament-rule { height: 14px; background: var(--img-zigzag) repeat-x left center; border: 0; margin: 1rem 0; opacity: 1; }
@@ -158,10 +157,124 @@ a { text-underline-offset: 2px; }
 
 /* Animasi halus */
 @keyframes th-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.reveal { opacity: 0; }
-.reveal.in { animation: th-fade-up .28s ease-out forwards; }
+.js .reveal { opacity: 0; }   /* hanya bila JS aktif (progressive enhancement) */
+.js .reveal.in { animation: th-fade-up .28s ease-out forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-  .reveal { opacity: 1; }
+  .js .reveal { opacity: 1; }
 }
+
+/* =====================================================================
+   FASE B — HALAMAN CUSTOMER
+   ===================================================================== */
+body.customer { background-color: var(--navy); background-image: var(--img-tribal); background-size: 240px 240px; }
+body.customer.has-bg-scenic { background-image: url("../images/theme/bg-scenic.webp"); background-size: cover; background-position: center top; }
+
+/* Hero / header: pola tribal gelap + overlay agar teks tetap terbaca */
+.cust-header { position: sticky; top: 0; z-index: 1020; color: var(--paper); border-bottom: 3px solid var(--ink); padding: .65rem 0 .5rem;
+  background: linear-gradient(rgba(15,27,45,.86), rgba(15,27,45,.92)), var(--img-tribal); background-size: auto, 240px 240px; box-shadow: 0 3px 0 var(--mustard); }
+.cust-header::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 14px; margin-top: 3px; background: var(--img-zigzag) repeat-x left top; pointer-events: none; }
+.cust-header .container { max-width: 760px; }
+.cust-header .text-muted { color: rgba(246,239,226,.78) !important; }
+.cust-brand { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+.cust-logo { height: 40px; width: auto; flex: 0 0 auto; }
+.cust-name { font-family: var(--font-head); font-size: 1.4rem; line-height: 1.1; letter-spacing: .04em; color: var(--paper); text-shadow: 0 2px 0 rgba(0,0,0,.45); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.table-stamp { margin-left: auto; font-size: .95rem; background: rgba(15,27,45,.55); flex: 0 0 auto; }
+
+/* Panel konten: kertas krem di atas latar tribal */
+body.customer main.paper-panel, body.customer .paper-panel.container { max-width: 760px; margin: 28px auto 0; padding: 1.1rem 1.1rem 1rem 1.7rem;
+  border: 2px solid var(--ink); border-bottom: 0; border-radius: 18px 18px 0 0; box-shadow: 0 0 0 3px var(--mustard); }
+@media (max-width: 575.98px) { body.customer main.paper-panel, body.customer .paper-panel.container { margin-top: 24px; border-left: 0; border-right: 0; border-radius: 0; box-shadow: none; padding-left: 1.4rem; padding-right: .9rem; } }
+.has-cartbar { padding-bottom: 1rem !important; }
+
+/* Kategori (chip etnik) */
+.cat-tabs { padding: .5rem .1rem 12px; margin-top: .25rem !important; }
+.cat-tabs .btn { --bs-btn-border-radius: 999px; position: relative; min-height: 40px; border-width: 2px; box-shadow: none; }
+.cat-tabs .btn-outline-dark { --bs-btn-color: var(--paper); --bs-btn-border-color: rgba(246,239,226,.6); --bs-btn-hover-bg: rgba(246,239,226,.16); --bs-btn-hover-color: #fff; --bs-btn-hover-border-color: var(--paper);
+  --bs-btn-active-bg: rgba(246,239,226,.16); --bs-btn-active-color: #fff; background: rgba(15,27,45,.5); color: var(--paper); }
+.cat-tabs .btn-dark { color: var(--ink); background: var(--orange-d); border-color: var(--mustard); font-weight: 600; box-shadow: 0 0 0 2px var(--ink), 0 3px 0 2px var(--ink); }
+.cat-tabs .btn-dark::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -13px; height: 7px; background: var(--img-zigzag) repeat-x center top; background-size: 24px 7px; }
+.cat-tabs .btn:active { transform: scale(.96); }
+
+/* Judul kategori di daftar menu */
+.menu-cat-head { margin-top: 1rem; }
+.menu-cat-head:first-child { margin-top: .25rem; }
+.menu-cat-title { display: inline-block; margin: 0; padding: .35rem 1rem; font-family: var(--font-head); font-size: 1.05rem; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--paper); background: var(--ink); border-radius: 6px; box-shadow: 3px 3px 0 var(--orange-d); }
+
+/* Bingkai foto (satu aturan untuk semua gambar menu/promo/flyer/detail) */
+.menu-img, .top-img, .pd-media img { --frame-w: 8px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; box-sizing: border-box; background-color: var(--ink); object-fit: cover; }
+
+/* Kartu menu: gaya buku menu */
+.menu-card { background: var(--bone); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+.menu-thumb { position: relative; flex: 0 0 116px; padding: 8px; }
+.menu-img { display: block; width: 100%; min-height: 0; height: auto; aspect-ratio: 1 / 1; }
+.menu-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; padding: .75rem .85rem .7rem .25rem; }
+.menu-head { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; }
+.menu-name { font-weight: 600; line-height: 1.25; color: var(--ink); min-width: 0; }
+.menu-price { font-size: 1.1rem; flex: 0 0 auto; }
+.menu-desc { font-size: .8rem; line-height: 1.35; color: var(--muted); margin: .2rem 0 .5rem; }
+.menu-foot { margin-top: auto; display: flex; justify-content: flex-end; align-items: center; min-height: 44px; }
+.menu-name.open-product:hover { color: var(--orange-dd); }
+.menu-card.is-off .menu-img, .menu-card.is-off .menu-name { filter: grayscale(.8); }
+.menu-card.is-off .menu-thumb::after { content: "HABIS"; position: absolute; inset: 8px; display: flex; align-items: center; justify-content: center; pointer-events: none;
+  background: rgba(20,17,15,.66); color: var(--paper); font-family: var(--font-head); letter-spacing: .12em; font-size: .95rem; }
+.btn-qty { width: 44px; height: 44px; }
+.qty-num { font-weight: 800; min-width: 1.7rem; }
+
+/* Top seller */
+.hscroll { padding: .6rem .15rem .8rem; gap: .85rem; }
+.top-card { position: relative; flex: 0 0 160px; padding: 8px 8px 0; background: var(--bone); border: 1px solid var(--line); box-shadow: var(--shadow-sm); overflow: visible; }
+.top-img { width: 100%; aspect-ratio: 4 / 3; height: auto; }
+.top-badge { position: absolute; top: -9px; left: -6px; z-index: 2; font-size: .62rem; padding: .22rem .45rem; border-width: 2px; }
+.top-name { color: var(--ink); }
+.top-price { font-size: 1rem; }
+.top-card .btn-qty { width: 44px; height: 44px; }
+.swipe-hint { color: var(--muted) !important; letter-spacing: .08em; }
+
+/* Promo: bingkai etnik, perilaku carousel tidak berubah */
+.promo-carousel .carousel-inner { --frame-w: 14px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; border-radius: 0; background: var(--ink); box-shadow: var(--shadow); box-sizing: border-box; }
+.promo-carousel .carousel-indicators [data-bs-target] { width: 10px; height: 10px; background-color: #b9a98d; }
+.promo-carousel .carousel-indicators .active { background-color: var(--orange-d); box-shadow: 0 0 0 2px var(--ink); }
+.price-note { margin: 1.25rem 0 0; text-align: center; font-style: italic; font-size: .78rem; color: var(--muted); }
+
+/* Tombol Lihat Pesanan (FAB) */
+.cart-fab { background: var(--orange-d); color: var(--ink); border: 3px solid var(--ink); min-height: 58px; font-weight: 800; letter-spacing: .01em;
+  box-shadow: 0 4px 0 var(--ink), 0 12px 24px rgba(0,0,0,.35); outline: 2px dashed var(--mustard); outline-offset: -9px; }
+.cart-fab:hover, .cart-fab:focus { background: var(--orange); color: var(--ink); }
+.cart-fab:active { transform: translateX(-50%) translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.cart-fab .cart-badge { background: var(--ink); color: var(--mustard); }
+.cart-fab.is-empty { background: var(--paper); color: var(--muted); border: 2px solid var(--ink); outline: 0; box-shadow: 0 3px 0 var(--ink), 0 8px 16px rgba(0,0,0,.25); font-weight: 600; }
+
+/* Modal detail produk */
+#product-modal .pd-content { background-color: var(--paper); background-image: var(--img-paper); border: 3px solid var(--ink); position: relative; isolation: isolate; }
+#product-modal .pd-content::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background-image: radial-gradient(circle, rgba(20,17,15,.2) 1.1px, transparent 1.6px); background-size: 8px 8px;
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 30%), linear-gradient(0deg, #000, transparent 25%); mask-image: linear-gradient(90deg, #000, transparent 30%), linear-gradient(0deg, #000, transparent 25%); }
+.pd-media { background: linear-gradient(rgba(15,27,45,.55), rgba(15,27,45,.55)), var(--img-tribal); background-size: auto, 200px 200px; padding: 16px 16px 14px; border-bottom: 3px solid var(--ink); }
+.pd-media img { --frame-w: 12px; width: 100%; max-height: 40vh; max-height: 40dvh; }
+.pd-media::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 14px; transform: translateY(100%); background: var(--img-zigzag) repeat-x; pointer-events: none; }
+.pd-x, .flyer-x { width: 44px; height: 44px; padding: 0; background-size: 14px; background-color: var(--paper); border: 2px solid var(--ink); border-radius: 50%; opacity: 1; box-shadow: 2px 2px 0 var(--ink); }
+.pd-nav { width: 44px; height: 44px; background: var(--paper); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.pd-nav:disabled { opacity: .4; }
+.pd-count { background: var(--ink); color: var(--mustard); font-weight: 600; }
+.pd-body { padding-top: 1.3rem; }
+.pd-body h2 { font-size: 1.5rem; color: var(--ink); }
+.pd-price { color: var(--orange-dd); font-weight: 800; }
+.pd-desc { color: var(--text); }
+.pd-foot { background: transparent; border-top: 2px dashed var(--line); }
+#pd-add { min-height: 48px; font-size: 1.05rem; }
+@media (max-width: 575.98px) { #product-modal .pd-content { border-radius: 1.25rem 1.25rem 0 0; border-bottom: 0; } }
+
+/* Popup flyer: bingkai besar */
+.flyer-content { --frame-w: 14px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; border-radius: 0; background: var(--ink); overflow: visible; }
+.flyer-img { background: var(--ink); }
+.flyer-foot { background: var(--paper); border-top: 3px solid var(--ink); }
+.flyer-foot .fw-bold { font-family: var(--font-head); font-weight: 400; letter-spacing: .03em; }
+.flyer-cta { background: var(--orange-d); color: var(--ink); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); font-weight: 800; }
+.flyer-x { top: -6px; right: -6px; }
+
+/* Footer pada halaman customer: bar gelap bergaris ornamen */
+body.customer .site-footer { position: relative; margin-top: 0; padding-top: 1.6rem; color: var(--paper); background: var(--ink); border-top: 3px solid var(--mustard); }
+body.customer .site-footer::before { content: ""; position: absolute; left: 0; right: 0; top: -17px; height: 14px; background: var(--img-zigzag) repeat-x; }
+body.customer .site-footer-fab { padding-bottom: 6.5rem; }

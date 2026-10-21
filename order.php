@@ -49,11 +49,10 @@ include __DIR__ . '/includes/header.php';
 ?>
 <header class="cust-header sticky-top">
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <div class="fw-semibold"><?= e(APP_NAME) ?></div>
-        <div class="small text-muted">Meja <?= e($table['table_number']) ?></div>
-      </div>
+    <div class="cust-brand">
+      <?php if ($logo = theme_logo()): ?><img class="cust-logo" src="<?= $base ?>assets/<?= e($logo) ?>" alt="" height="40"><?php endif; ?>
+      <div class="cust-name"><?= e(APP_NAME) ?></div>
+      <span class="stamp table-stamp">Meja <?= e($table['table_number']) ?></span>
     </div>
     <div class="cat-tabs mt-2">
       <button class="btn btn-sm btn-dark" data-cat="all" aria-pressed="true"><i class="bi bi-grid-fill" aria-hidden="true"></i> Semua</button>
@@ -64,17 +63,18 @@ include __DIR__ . '/includes/header.php';
   </div>
 </header>
 
-<main class="container py-3 has-cartbar">
+<main class="container py-3 has-cartbar paper-panel">
   <?php if ($topSellers): ?>
   <section id="top-seller" class="mb-4" aria-labelledby="ts-title">
     <h2 id="ts-title" class="section-title">TOP SELLER</h2>
     <div class="hscroll" tabindex="0" aria-label="Top seller, geser ke kiri atau kanan">
       <?php foreach ($topSellers as $t): ?>
-        <div class="card menu-card top-card" data-id="<?= (int) $t['id'] ?>" data-name="<?= e($t['name']) ?>" data-price="<?= (int) $t['price'] ?>">
+        <div class="card menu-card top-card reveal" data-id="<?= (int) $t['id'] ?>" data-name="<?= e($t['name']) ?>" data-price="<?= (int) $t['price'] ?>">
+          <span class="stamp stamp-solid top-badge" aria-hidden="true">Top Seller</span>
           <img class="top-img open-product" alt="" loading="lazy" role="button" tabindex="0" data-open="<?= (int) $t['id'] ?>" src="<?= $base ?>assets/images/<?= e($t['image'] ?: 'placeholder.svg') ?>">
           <div class="p-2 d-flex flex-column flex-grow-1">
             <div class="fw-semibold top-name open-product" role="button" tabindex="0" data-open="<?= (int) $t['id'] ?>"><?= e($t['name']) ?></div>
-            <div class="small fw-bold mb-2"><?= e(rupiah($t['price'])) ?></div>
+            <div class="top-price mb-2"><?= price_short_html($t['price']) ?></div>
             <div class="qty-control mt-auto" data-qty-control></div>
           </div>
         </div>
@@ -110,23 +110,31 @@ include __DIR__ . '/includes/header.php';
 
   <section id="menu" aria-labelledby="menu-title">
   <h2 id="menu-title" class="section-title">MENU</h2>
+  <?php $catName = []; foreach ($categories as $c) { $catName[(int) $c['id']] = $c['name']; } $lastCat = null; ?>
   <div class="row g-3">
     <?php foreach ($products as $p): ?>
-      <div class="col-12 col-md-6 menu-item" data-cat="<?= (int) $p['category_id'] ?>">
-        <div class="card menu-card h-100"
+      <?php if ($lastCat !== (int) $p['category_id']): $lastCat = (int) $p['category_id']; ?>
+        <div class="col-12 menu-cat-head" data-cat="<?= $lastCat ?>"><h3 class="menu-cat-title"><?= e(isset($catName[$lastCat]) ? $catName[$lastCat] : '') ?></h3></div>
+      <?php endif; ?>
+      <div class="col-12 col-md-6 menu-item reveal" data-cat="<?= (int) $p['category_id'] ?>">
+        <div class="card menu-card h-100<?= $p['is_available'] ? '' : ' is-off' ?>"
              data-id="<?= (int) $p['id'] ?>" data-name="<?= e($p['name']) ?>" data-price="<?= (int) $p['price'] ?>">
           <div class="d-flex">
-            <img class="menu-img open-product" alt="" loading="lazy" role="button" tabindex="0" data-open="<?= (int) $p['id'] ?>"
-                 src="<?= $base ?>assets/images/<?= e($p['image'] ?: 'placeholder.svg') ?>">
-            <div class="p-3 flex-grow-1 d-flex flex-column">
-              <div class="fw-semibold open-product" role="button" tabindex="0" data-open="<?= (int) $p['id'] ?>"><?= e($p['name']) ?></div>
-              <div class="small text-muted mb-1"><?= e($p['description']) ?></div>
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-                <span class="fw-bold"><?= e(rupiah($p['price'])) ?></span>
+            <div class="menu-thumb">
+              <img class="menu-img open-product" alt="" loading="lazy" role="button" tabindex="0" data-open="<?= (int) $p['id'] ?>"
+                   src="<?= $base ?>assets/images/<?= e($p['image'] ?: 'placeholder.svg') ?>">
+            </div>
+            <div class="menu-info">
+              <div class="menu-head">
+                <div class="menu-name open-product" role="button" tabindex="0" data-open="<?= (int) $p['id'] ?>"><?= e($p['name']) ?></div>
+                <div class="menu-price"><?= price_short_html($p['price']) ?></div>
+              </div>
+              <div class="menu-desc"><?= e($p['description']) ?></div>
+              <div class="menu-foot">
                 <?php if ($p['is_available']): ?>
                   <div class="qty-control" data-qty-control></div>
                 <?php else: ?>
-                  <span class="badge text-bg-secondary">Habis</span>
+                  <span class="badge text-bg-danger">Habis</span>
                 <?php endif; ?>
               </div>
             </div>
@@ -136,6 +144,7 @@ include __DIR__ . '/includes/header.php';
     <?php endforeach; ?>
     <?php if (!$products): ?><p class="text-center text-muted">Belum ada menu.</p><?php endif; ?>
   </div>
+  <?php if (($note = price_note_text()) !== ''): ?><p class="price-note"><?= e($note) ?></p><?php endif; ?>
   </section>
 </main>
 

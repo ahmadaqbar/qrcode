@@ -14,6 +14,7 @@ $admin = !empty($admin);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e(isset($page_title) ? $page_title . ' - ' : '') . e(APP_NAME) ?></title>
+  <script>document.documentElement.className += " js";</script>
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/css/style.css">
@@ -24,7 +25,7 @@ $admin = !empty($admin);
   <script>try { if (localStorage.getItem('admin_sidebar_collapsed') === '1') document.documentElement.classList.add('sb-collapsed'); } catch (e) {}</script>
 <?php endif; ?>
 </head>
-<body class="<?= $admin ? 'admin' : 'customer' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
+<body class="<?= $admin ? 'admin' : 'customer' ?><?= is_file(ROOT_PATH . '/assets/images/theme/bg-scenic.webp') ? ' has-bg-scenic' : '' ?>" data-page="<?= e($page) ?>" data-base="<?= e($base) ?>"
 <?php foreach ($body_attrs as $k => $v): ?> data-<?= e($k) ?>="<?= e($v) ?>"<?php endforeach; ?>>
 <?php
 $admin_shell = $admin && is_logged_in();

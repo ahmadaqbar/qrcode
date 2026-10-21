@@ -105,6 +105,14 @@ def divider():
     return svg(48, 14, b)
 
 
+# ---------- divider-zigzag-v.svg : pita vertikal 14x48 (repeat-y) utk tepi kiri panel ----------
+def divider_v():
+    b = '<rect width="14" height="48" fill="%s"/>' % INK
+    b += ''.join('<polygon points="1,%d 12,%d 1,%d" fill="%s"/>' % (y, y + 6, y + 12, c) for y, c in ((0, ORANGE), (12, MUSTARD), (24, TEAL), (36, CRIMSON)))
+    b += '<rect x="0" width="1.5" height="48" fill="%s"/><rect x="12.5" width="1.5" height="48" fill="%s"/>' % (CREAM, CREAM)
+    return svg(14, 48, b)
+
+
 # ---------- divider-ornament.svg : garis tipis zigzag berwarna (utk judul section) ----------
 def divider_thin():
     b = '<polyline points="0,8 6,2 12,8 18,2 24,8" fill="none" stroke="%s" stroke-width="2"/>' % ORANGE
@@ -160,7 +168,7 @@ def success_orn():
     return svg(120, 120, b)
 
 
-builders = {'pattern-tribal.svg': tile_dark, 'pattern-tribal-soft.svg': tile_soft, 'divider-zigzag.svg': divider, 'divider-ornament.svg': divider_thin,
+builders = {'pattern-tribal.svg': tile_dark, 'pattern-tribal-soft.svg': tile_soft, 'divider-zigzag.svg': divider, 'divider-zigzag-v.svg': divider_v, 'divider-ornament.svg': divider_thin,
             'frame-border.svg': frame, 'paper.svg': paper, 'stamp-ring.svg': stamp, 'ornament-success.svg': success_orn}
 files = {}
 for name, fn in builders.items():
