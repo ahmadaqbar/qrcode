@@ -38,8 +38,11 @@ Font: judul bergaya slab-serif **Alfa Slab One** (judul seksi, nama brand, nomor
 ## Regenerasi pola
 
 ```
-python3 tools/gen-theme-patterns.py
+python3 tools/gen-theme-patterns.py          # calm (default): garis emas + titik kecil
+python3 tools/gen-theme-patterns.py line     # garis emas polos
+python3 tools/gen-theme-patterns.py none     # tanpa pemisah ornamen
 ```
+Tema sengaja tanpa segitiga/zig-zag warna-warni agar nyaman dilihat; pola latar hanya lingkaran, spiral, dan titik, dan diredupkan dengan lapisan navy 60%.
 
 ## Aksesibilitas & performa
 

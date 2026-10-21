@@ -138,7 +138,7 @@ a { text-underline-offset: 2px; }
 .paper-panel::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 0; top: 0; bottom: 0; width: 14px; background: var(--img-zigzag-v) repeat-y left top; }
 
 /* Pemisah ornamen */
-.ornament-rule { height: 14px; background: var(--img-zigzag) repeat-x left center; border: 0; margin: 1rem 0; opacity: 1; }
+.ornament-rule { height: 14px; background: var(--img-ornament) repeat-x left center; border: 0; margin: 1rem 0; opacity: 1; }
 .ornament-thin { height: 14px; background: var(--img-ornament) repeat-x left center; }
 
 /* Judul section ala cetak: slab "stempel" + garis ornamen */
@@ -168,7 +168,7 @@ a { text-underline-offset: 2px; }
 /* =====================================================================
    FASE B — HALAMAN CUSTOMER
    ===================================================================== */
-body.customer { background-color: var(--navy); background-image: var(--img-tribal); background-size: 240px 240px; }
+body.customer { background-color: var(--navy); background-image: linear-gradient(rgba(15,27,45,.6), rgba(15,27,45,.6)), var(--img-tribal); background-size: auto, 240px 240px; }
 body.customer.has-bg-scenic { background-image: url("../images/theme/bg-scenic.webp"); background-size: cover; background-position: center top; }
 
 /* Hero / header: pola tribal gelap + overlay agar teks tetap terbaca */
@@ -194,7 +194,7 @@ body.customer main.paper-panel, body.customer .paper-panel.container { max-width
 .cat-tabs .btn-outline-dark { --bs-btn-color: var(--paper); --bs-btn-border-color: rgba(246,239,226,.6); --bs-btn-hover-bg: rgba(246,239,226,.16); --bs-btn-hover-color: #fff; --bs-btn-hover-border-color: var(--paper);
   --bs-btn-active-bg: rgba(246,239,226,.16); --bs-btn-active-color: #fff; background: rgba(15,27,45,.5); color: var(--paper); }
 .cat-tabs .btn-dark { color: var(--ink); background: var(--orange-d); border-color: var(--mustard); font-weight: 600; box-shadow: 0 0 0 2px var(--ink), 0 3px 0 2px var(--ink); }
-.cat-tabs .btn-dark::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -13px; height: 7px; background: var(--img-zigzag) repeat-x center top; background-size: 24px 7px; }
+.cat-tabs .btn-dark::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -13px; height: 7px; background: var(--img-ornament) repeat-x center 0; }
 .cat-tabs .btn:active { transform: scale(.96); }
 
 /* Judul kategori di daftar menu */
@@ -375,7 +375,7 @@ body.admin { background-color: var(--paper-2); }
 #notif-banner { border-radius: 0; border-left: 0; border-bottom: 3px solid var(--mustard); }
 
 /* Login: latar tribal penuh, kartu krem berbingkai */
-body.login-page { background-color: var(--navy); background-image: var(--img-tribal); background-size: 240px 240px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+body.login-page { background-color: var(--navy); background-image: linear-gradient(rgba(15,27,45,.6), rgba(15,27,45,.6)), var(--img-tribal); background-size: auto, 240px 240px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 .login-page .login-wrap { padding-top: 9vh; flex: 1 0 auto; }
 .login-page .login-wrap .card { background-color: var(--paper); background-image: var(--img-paper); max-width: 400px;
   --frame-w: 16px; border: var(--frame-w) solid transparent; border-image: var(--img-frame) 24 / var(--frame-w) round; border-radius: 0; box-shadow: 0 10px 30px rgba(0,0,0,.45); }

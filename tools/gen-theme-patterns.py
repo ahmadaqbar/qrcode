@@ -4,7 +4,7 @@ Generator pola tema "African Ethnic / Batik Tribal" (DEV ONLY — hasilnya sudah
 Jalankan hanya bila ingin mengubah pola/palet:  python3 tools/gen-theme-patterns.py
 Semua SVG seamless (elemen di tepi digandakan di sisi seberang) dan tanpa referensi eksternal.
 """
-import math, os
+import math, os, sys
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'assets', 'images', 'theme')
 INK, NAVY = '#14110F', '#0F1B2D'
@@ -83,57 +83,58 @@ def tile_dark():
     b += wrap(lambda: concentric(180, 180, [BLUE, CREAM, ORANGE, INK, MUSTARD, NAVY, TEAL], 44, 6), 240, 240)
     b += wrap(lambda: spiral(180, 60, 3.2, 30, MUSTARD) + spiral(180, 60, 3.2, 20, ORANGE, 1.6), 240, 240)
     b += wrap(lambda: spiral(60, 180, 3.2, 30, TEAL), 240, 240)
-    b += wrap(lambda: chevrons(112, 8, 16, 4, CRIMSON) + chevrons(112, 196, 16, 4, MUSTARD), 240, 240)
-    b += wrap(lambda: diamond_x(120, 120, 16, BLUE, CREAM) + diamond_x(0, 120, 12, CRIMSON, MUSTARD) + diamond_x(120, 0, 12, TEAL, CREAM), 240, 240)
     b += wrap(lambda: dot_grid(112, 60, 4, 4, 6, CREAM) + dot_grid(8, 176, 5, 3, 6, MUSTARD), 240, 240)
-    b += wrap(lambda: triangles(100, 222, 4, 10, ORANGE) + triangles(140, 100, 3, 10, TEAL), 240, 240)
     return svg(240, 240, b)
 
 
 # ---------- pattern-tribal-soft.svg : versi pudar utk panel krem ----------
 def tile_soft():
     b = wrap(lambda: concentric(40, 40, [ORANGE, CREAM, MUSTARD, CREAM, TEAL], 26, 5) + concentric(120, 120, [BLUE, CREAM, CRIMSON, CREAM, ORANGE], 26, 5)
-             + diamond_x(120, 40, 10, TEAL, CREAM) + diamond_x(40, 120, 10, CRIMSON, MUSTARD) + dot_grid(66, 20, 3, 3, 6, MUSTARD), 160, 160)
+             + dot_grid(66, 20, 3, 3, 6, MUSTARD), 160, 160)
     return svg(160, 160, b)
 
 
-# ---------- divider-zigzag.svg : pita 48x14 (repeat-x) ----------
+# Gaya pemisah (argumen CLI): calm = garis emas + titik (default), line = garis polos, none = tanpa ornamen
+STYLE = sys.argv[1] if len(sys.argv) > 1 else 'calm'
+
+
+def _hline(w, h, y, dots):
+    if STYLE == 'none':
+        return svg(w, h, '')
+    b = '<rect x="0" y="%s" width="%d" height="2" fill="%s"/>' % (y, w, MUSTARD)
+    if STYLE == 'calm' and dots:
+        b += ''.join('<circle cx="%d" cy="%s" r="1.6" fill="%s"/>' % (x, y + 7, ORANGE) for x in range(6, w, 12))
+    return svg(w, h, b)
+
+
+# ---------- divider-zigzag.svg (nama lama dipertahankan): pita 24x14 repeat-x ----------
 def divider():
-    b = '<rect width="48" height="14" fill="%s"/>' % INK
-    b += ''.join('<polygon points="%d,13 %d,2 %d,13" fill="%s"/>' % (x, x + 6, x + 12, c) for x, c in ((0, ORANGE), (12, MUSTARD), (24, TEAL), (36, CRIMSON)))
-    b += '<rect y="0" width="48" height="1.5" fill="%s"/><rect y="12.5" width="48" height="1.5" fill="%s"/>' % (CREAM, CREAM)
-    return svg(48, 14, b)
+    # pita penutup di tepi header/sidebar/footer: dasar navy solid supaya pola latar tidak tembus
+    inner = _hline(24, 14, 3, True)
+    return inner.replace('>', '><rect width="24" height="14" fill="%s"/>' % NAVY, 1) if STYLE != 'none' else inner
 
 
-# ---------- divider-zigzag-v.svg : pita vertikal 14x48 (repeat-y) utk tepi kiri panel ----------
+# ---------- divider-zigzag-v.svg : pita vertikal 14x24 (repeat-y) utk tepi kiri panel ----------
 def divider_v():
-    b = '<rect width="14" height="48" fill="%s"/>' % INK
-    b += ''.join('<polygon points="1,%d 12,%d 1,%d" fill="%s"/>' % (y, y + 6, y + 12, c) for y, c in ((0, ORANGE), (12, MUSTARD), (24, TEAL), (36, CRIMSON)))
-    b += '<rect x="0" width="1.5" height="48" fill="%s"/><rect x="12.5" width="1.5" height="48" fill="%s"/>' % (CREAM, CREAM)
-    return svg(14, 48, b)
+    if STYLE == 'none':
+        return svg(14, 24, '')
+    b = '<rect width="14" height="24" fill="%s"/>' % NAVY
+    b += '<rect x="3" y="0" width="2" height="24" fill="%s"/>' % MUSTARD
+    if STYLE == 'calm':
+        b += ''.join('<circle cx="10" cy="%d" r="1.6" fill="%s"/>' % (y, ORANGE) for y in range(6, 24, 12))
+    return svg(14, 24, b)
 
 
-# ---------- divider-ornament.svg : garis tipis zigzag berwarna (utk judul section) ----------
+# ---------- divider-ornament.svg : garis tipis untuk judul section ----------
 def divider_thin():
-    b = '<polyline points="0,8 6,2 12,8 18,2 24,8" fill="none" stroke="%s" stroke-width="2"/>' % ORANGE
-    b += ''.join('<circle cx="%d" cy="12" r="1.3" fill="%s"/>' % (x, MUSTARD) for x in (6, 18))
-    return svg(24, 14, b)
+    return _hline(24, 14, 6, False)
 
 
-# ---------- frame-border.svg : 72x72, slice 24 -> bingkai foto (pita krem + segitiga, garis merah bertitik di sisi foto) ----------
+# ---------- frame-border.svg : 72x72, slice 24 -> bingkai foto tenang (pita krem polos, garis merah bertitik di sisi foto) ----------
 def frame():
     SAND = '#EBD9B4'
     b = '<rect width="72" height="72" fill="%s"/>' % SAND
-    b += '<rect x="24" y="24" width="24" height="24" fill="none"/>'
-    # segitiga bergantian navy / oranye di pita (atas, bawah, kiri, kanan); periode 12 membagi 24
-    for x in range(0, 72, 12):
-        c1, c2 = (NAVY, ORANGE) if (x // 12) % 2 == 0 else (ORANGE, NAVY)
-        b += '<polygon points="%d,3 %d,17 %d,3" fill="%s"/>' % (x + 1, x + 6, x + 11, c1)
-        b += '<polygon points="%d,69 %d,55 %d,69" fill="%s"/>' % (x + 1, x + 6, x + 11, c2)
-    for y in range(24, 48, 12):
-        b += '<polygon points="3,%d 17,%d 3,%d" fill="%s"/><polygon points="69,%d 55,%d 69,%d" fill="%s"/>' % (y + 1, y + 6, y + 11, NAVY, y + 1, y + 6, y + 11, ORANGE)
-    for (cx, cy) in ((12, 12), (60, 12), (12, 60), (60, 60)):
-        b += '<polygon points="%d,%d %d,%d %d,%d %d,%d" fill="%s" stroke="%s" stroke-width="1.5"/>' % (cx, cy - 10, cx + 10, cy, cx, cy + 10, cx - 10, cy, MUSTARD, CRIMSON)
+    b += '<rect x="9" y="9" width="54" height="54" fill="none" stroke="%s" stroke-width="1.5"/>' % NAVY
     # garis merah dengan titik krem tepat di sisi foto (area 20..24 dan 48..52)
     b += '<rect x="22" y="22" width="28" height="28" fill="none" stroke="%s" stroke-width="4"/>' % CRIMSON
     for i in range(23, 50, 5):
