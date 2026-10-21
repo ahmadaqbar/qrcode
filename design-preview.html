@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview Desain - Quiet Ethnic</title>
+<link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+<link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/quiet.css">
+<style>
+  /* CSS khusus halaman preview (bukan bagian aplikasi) */
+  body.pv { padding: 24px 16px 48px; }
+  .pv-top { max-width: 1240px; margin: 0 auto 24px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+  .pv-top h1 { font-size: 1.6rem; margin: 0; }
+  .pv-top p { margin: 4px 0 0; color: #6B5A4A; max-width: 60ch; }
+  .pv-switch { display: inline-flex; gap: 8px; }
+  .pv-switch button { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid #D8C7A8; background: #fff; color: #2B1D14; font-weight: 700; }
+  .pv-switch button[aria-pressed="true"] { background: #B95A14; border-color: #B95A14; color: #fff; }
+  .pv-grid { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 390px)); gap: 28px 32px; justify-content: center; }
+  body[data-show="a"] [data-variant="theme-night"], body[data-show="b"] [data-variant="a"] { display: none; }
+  .pv-cap { font-family: var(--q-font-body); font-size: .9rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #6B5A4A; margin: 0 0 8px; }
+  .pv-phone { width: 100%; max-width: 390px; height: 780px; overflow-y: auto; overflow-x: hidden; position: relative; border: 8px solid #1E1611; border-radius: 34px;
+    background: var(--q-bg); color: var(--q-text); display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(43,29,20,.25); scrollbar-width: none; }
+  .pv-phone::-webkit-scrollbar { display: none; }
+  .pv-phone .q-main { flex: 1 0 auto; }
+  .pv-phone .cart-fab.pv-fab { position: sticky; left: auto; bottom: 12px; transform: none; width: calc(100% - 24px); margin: 0 12px 12px; flex: 0 0 auto; }
+  .pv-phone .q-actionbar.pv-actionbar { position: sticky; margin-top: auto; }
+  .pv-promo { aspect-ratio: 16 / 7; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff; font-family: var(--q-font-head); font-size: 1.7rem; background: linear-gradient(110deg, #B95A14, #E3A62F); }
+  .pv-promo small { font-family: var(--q-font-body); font-size: .85rem; opacity: .95; }
+  .pv-phone.theme-night .pv-promo { background: linear-gradient(110deg, #5b3a1c, #D9762A); }
+  .pv-phone .q-grid { grid-template-columns: 1fr; }   /* layar ponsel di dalam frame, bukan tablet */
+  .pv-phone .modal-backdrop { display: none; }
+</style>
+</head>
+<body class="pv" data-show="both">
+<div class="pv-top">
+  <div><h1>Preview desain: Quiet Ethnic</h1>
+  <p>90% bersih &amp; lega, 10% etnik. Pola hanya di hero header (opacity 8%). Gulir di dalam layar ponsel untuk melihat header mengecil dan chip kategori menempel. Dua varian memakai CSS yang sama (<code>assets/css/quiet.css</code>); varian B aktif hanya dengan class <code>theme-night</code>.</p></div>
+  <div class="pv-switch" role="group" aria-label="Pilih varian">
+    <button type="button" data-v="both" aria-pressed="true">Berdampingan</button>
+    <button type="button" data-v="a" aria-pressed="false">A · Warm Minimal</button>
+    <button type="button" data-v="b" aria-pressed="false">B · Espresso Night</button>
+  </div>
+</div>
+<div class="pv-grid">
+
+<section class="pv-col" data-variant="a">
+ <h2 class="pv-cap">Varian A · Warm Minimal · Daftar menu</h2>
+ <div class="pv-phone ">
+  <header class="q-header q-header-hero">
+    <div class="q-wrap q-hero-extra">Selamat datang di</div>
+    <div class="q-wrap q-bar"><div class="q-name">Warung Nusantara</div><span class="q-table">Meja 07</span></div>
+  </header>
+  <nav class="q-cats"><div class="q-wrap"><div class="cat-tabs">
+    <button class="btn btn-sm btn-dark"><i class="bi bi-grid-fill"></i> Semua</button>
+    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-egg-fried"></i> Makanan</button>
+    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-cup-straw"></i> Minuman</button>
+    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-cake2"></i> Dessert</button>
+  </div></div></nav>
+  <main class="q-wrap q-main">
+    <section class="q-section"><div class="carousel promo-carousel"><div class="carousel-inner"><div class="carousel-item active">
+      <div class="promo-img pv-promo">Promo Akhir Pekan<small>Diskon 20% untuk menu pilihan</small></div></div></div>
+      <div class="carousel-indicators"><button data-bs-target="#pv" class="active"></button><button data-bs-target="#pv"></button><button data-bs-target="#pv"></button></div></div></section>
+    <section class="q-section"><h2 class="q-section-title">Top Seller</h2>
+      <div class="hscroll">
+        <div class="card menu-card top-card"><div class="top-photo"><img class="top-img" alt="" src="assets/images/placeholder.svg"><span class="q-badge">Top Seller</span></div>
+          <div class="top-body"><div class="top-name">Nasi Goreng Spesial</div><div class="top-foot"><span class="q-price">Rp 25.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div>
+        <div class="card menu-card top-card"><div class="top-photo"><img class="top-img" alt="" src="assets/images/placeholder.svg"><span class="q-badge">Top Seller</span></div>
+          <div class="top-body"><div class="top-name">Kopi Susu</div><div class="top-foot"><span class="q-price">Rp 15.000</span><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">1</span><button class="btn btn-dark btn-qty">+</button></div></div></div></div>
+        <div class="card menu-card top-card"><div class="top-photo"><img class="top-img" alt="" src="assets/images/placeholder.svg"><span class="q-badge">Top Seller</span></div>
+          <div class="top-body"><div class="top-name">Ayam Bakar</div><div class="top-foot"><span class="q-price">Rp 30.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div>
+      </div></section>
+    <section class="q-section"><div class="q-grid">
+      <div class="menu-cat-head"><h2 class="menu-cat-title">Makanan</h2></div>
+      <div class="menu-item"><div class="card menu-card"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Ayam Bakar</div><div class="menu-desc">Ayam bakar bumbu kecap dengan lalapan dan sambal terasi.</div><div class="menu-foot"><span class="q-price">Rp 30.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div></div>
+      <div class="menu-item"><div class="card menu-card"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Mie Goreng</div><div class="menu-desc">Mie goreng dengan sayuran dan telur.</div><div class="menu-foot"><span class="q-price">Rp 23.000</span><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">2</span><button class="btn btn-dark btn-qty">+</button></div></div></div></div></div>
+      <div class="menu-item"><div class="card menu-card is-off"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Sate Ayam</div><div class="menu-desc">10 tusuk sate ayam bumbu kacang.</div><div class="menu-foot"><span class="q-price">Rp 28.000</span><span class="q-habis">Habis</span><button class="btn btn-qty" disabled>+</button></div></div></div></div>
+      <div class="menu-cat-head"><h2 class="menu-cat-title">Minuman</h2></div>
+      <div class="menu-item"><div class="card menu-card"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Es Teh Manis</div><div class="menu-desc">Teh manis dingin.</div><div class="menu-foot"><span class="q-price">Rp 8.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div></div>
+    </div><p class="price-note">*Harga belum termasuk pajak &amp; service</p></section>
+  </main>
+  <a class="cart-fab pv-fab"><span class="cart-fab-main"><svg class="cart-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 7H6"/></svg><span>Lihat Pesanan</span><span class="cart-badge"><span>3</span></span></span><span class="cart-fab-total">Rp 61.000</span></a>
+  <footer class="site-footer">Copyright &copy; 2026 IT Division</footer>
+ </div>
+</section>
+
+<section class="pv-col" data-variant="a">
+ <h2 class="pv-cap">Varian A · Warm Minimal · Halaman Pesanan</h2>
+ <div class="pv-phone ">
+  <header class="q-header"><div class="q-wrap q-bar"><a class="q-back"><i class="bi bi-arrow-left"></i></a><div class="q-name">Daftar Pesanan</div><span class="q-table">Meja 07</span></div></header>
+  <main class="q-wrap q-main q-narrow">
+    <div class="q-rows">
+      <div class="q-row"><img class="q-row-img" alt="" src="assets/images/placeholder.svg"><div class="q-row-main"><div class="q-row-name">Mie Goreng</div><div class="q-row-unit">Rp 23.000</div><button class="btn btn-link q-row-del">Hapus</button></div>
+        <div class="q-row-side"><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">2</span><button class="btn btn-dark btn-qty">+</button></div><div class="q-row-sub">Rp 46.000</div></div></div>
+      <div class="q-row"><img class="q-row-img" alt="" src="assets/images/placeholder.svg"><div class="q-row-main"><div class="q-row-name">Kopi Susu</div><div class="q-row-unit">Rp 15.000</div><button class="btn btn-link q-row-del">Hapus</button></div>
+        <div class="q-row-side"><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">1</span><button class="btn btn-dark btn-qty">+</button></div><div class="q-row-sub">Rp 15.000</div></div></div>
+    </div>
+    <div class="q-card" style="margin-top:12px"><label class="q-label">Catatan untuk dapur</label><textarea class="form-control" rows="3" placeholder="Contoh: Tidak pedas, sedikit gula, tanpa es"></textarea></div>
+    <div class="q-card q-summary"><div class="q-sum-row"><span>Subtotal</span><strong>Rp 61.000</strong></div><p class="q-sum-note">*Harga belum termasuk pajak &amp; service</p></div>
+  </main>
+  <div class="q-actionbar pv-actionbar"><div class="q-wrap"><button class="btn btn-accent w-100">Konfirmasi Pesanan</button></div></div>
+ </div>
+</section>
+
+<section class="pv-col" data-variant="theme-night">
+ <h2 class="pv-cap">Varian B · Espresso Night · Daftar menu</h2>
+ <div class="pv-phone theme-night">
+  <header class="q-header q-header-hero">
+    <div class="q-wrap q-hero-extra">Selamat datang di</div>
+    <div class="q-wrap q-bar"><div class="q-name">Warung Nusantara</div><span class="q-table">Meja 07</span></div>
+  </header>
+  <nav class="q-cats"><div class="q-wrap"><div class="cat-tabs">
+    <button class="btn btn-sm btn-dark"><i class="bi bi-grid-fill"></i> Semua</button>
+    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-egg-fried"></i> Makanan</button>
+    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-cup-straw"></i> Minuman</button>
+    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-cake2"></i> Dessert</button>
+  </div></div></nav>
+  <main class="q-wrap q-main">
+    <section class="q-section"><div class="carousel promo-carousel"><div class="carousel-inner"><div class="carousel-item active">
+      <div class="promo-img pv-promo">Promo Akhir Pekan<small>Diskon 20% untuk menu pilihan</small></div></div></div>
+      <div class="carousel-indicators"><button data-bs-target="#pv" class="active"></button><button data-bs-target="#pv"></button><button data-bs-target="#pv"></button></div></div></section>
+    <section class="q-section"><h2 class="q-section-title">Top Seller</h2>
+      <div class="hscroll">
+        <div class="card menu-card top-card"><div class="top-photo"><img class="top-img" alt="" src="assets/images/placeholder.svg"><span class="q-badge">Top Seller</span></div>
+          <div class="top-body"><div class="top-name">Nasi Goreng Spesial</div><div class="top-foot"><span class="q-price">Rp 25.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div>
+        <div class="card menu-card top-card"><div class="top-photo"><img class="top-img" alt="" src="assets/images/placeholder.svg"><span class="q-badge">Top Seller</span></div>
+          <div class="top-body"><div class="top-name">Kopi Susu</div><div class="top-foot"><span class="q-price">Rp 15.000</span><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">1</span><button class="btn btn-dark btn-qty">+</button></div></div></div></div>
+        <div class="card menu-card top-card"><div class="top-photo"><img class="top-img" alt="" src="assets/images/placeholder.svg"><span class="q-badge">Top Seller</span></div>
+          <div class="top-body"><div class="top-name">Ayam Bakar</div><div class="top-foot"><span class="q-price">Rp 30.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div>
+      </div></section>
+    <section class="q-section"><div class="q-grid">
+      <div class="menu-cat-head"><h2 class="menu-cat-title">Makanan</h2></div>
+      <div class="menu-item"><div class="card menu-card"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Ayam Bakar</div><div class="menu-desc">Ayam bakar bumbu kecap dengan lalapan dan sambal terasi.</div><div class="menu-foot"><span class="q-price">Rp 30.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div></div>
+      <div class="menu-item"><div class="card menu-card"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Mie Goreng</div><div class="menu-desc">Mie goreng dengan sayuran dan telur.</div><div class="menu-foot"><span class="q-price">Rp 23.000</span><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">2</span><button class="btn btn-dark btn-qty">+</button></div></div></div></div></div>
+      <div class="menu-item"><div class="card menu-card is-off"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Sate Ayam</div><div class="menu-desc">10 tusuk sate ayam bumbu kacang.</div><div class="menu-foot"><span class="q-price">Rp 28.000</span><span class="q-habis">Habis</span><button class="btn btn-qty" disabled>+</button></div></div></div></div>
+      <div class="menu-cat-head"><h2 class="menu-cat-title">Minuman</h2></div>
+      <div class="menu-item"><div class="card menu-card"><img class="menu-img" alt="" src="assets/images/placeholder.svg"><div class="menu-info"><div class="menu-name">Es Teh Manis</div><div class="menu-desc">Teh manis dingin.</div><div class="menu-foot"><span class="q-price">Rp 8.000</span><div class="qty-control"><button class="btn btn-dark btn-qty">+</button></div></div></div></div></div>
+    </div><p class="price-note">*Harga belum termasuk pajak &amp; service</p></section>
+  </main>
+  <a class="cart-fab pv-fab"><span class="cart-fab-main"><svg class="cart-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 7H6"/></svg><span>Lihat Pesanan</span><span class="cart-badge"><span>3</span></span></span><span class="cart-fab-total">Rp 61.000</span></a>
+  <footer class="site-footer">Copyright &copy; 2026 IT Division</footer>
+ </div>
+</section>
+
+<section class="pv-col" data-variant="theme-night">
+ <h2 class="pv-cap">Varian B · Espresso Night · Halaman Pesanan</h2>
+ <div class="pv-phone theme-night">
+  <header class="q-header"><div class="q-wrap q-bar"><a class="q-back"><i class="bi bi-arrow-left"></i></a><div class="q-name">Daftar Pesanan</div><span class="q-table">Meja 07</span></div></header>
+  <main class="q-wrap q-main q-narrow">
+    <div class="q-rows">
+      <div class="q-row"><img class="q-row-img" alt="" src="assets/images/placeholder.svg"><div class="q-row-main"><div class="q-row-name">Mie Goreng</div><div class="q-row-unit">Rp 23.000</div><button class="btn btn-link q-row-del">Hapus</button></div>
+        <div class="q-row-side"><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">2</span><button class="btn btn-dark btn-qty">+</button></div><div class="q-row-sub">Rp 46.000</div></div></div>
+      <div class="q-row"><img class="q-row-img" alt="" src="assets/images/placeholder.svg"><div class="q-row-main"><div class="q-row-name">Kopi Susu</div><div class="q-row-unit">Rp 15.000</div><button class="btn btn-link q-row-del">Hapus</button></div>
+        <div class="q-row-side"><div class="qty-control"><button class="btn btn-outline-dark btn-qty">−</button><span class="qty-num">1</span><button class="btn btn-dark btn-qty">+</button></div><div class="q-row-sub">Rp 15.000</div></div></div>
+    </div>
+    <div class="q-card" style="margin-top:12px"><label class="q-label">Catatan untuk dapur</label><textarea class="form-control" rows="3" placeholder="Contoh: Tidak pedas, sedikit gula, tanpa es"></textarea></div>
+    <div class="q-card q-summary"><div class="q-sum-row"><span>Subtotal</span><strong>Rp 61.000</strong></div><p class="q-sum-note">*Harga belum termasuk pajak &amp; service</p></div>
+  </main>
+  <div class="q-actionbar pv-actionbar"><div class="q-wrap"><button class="btn btn-accent w-100">Konfirmasi Pesanan</button></div></div>
+ </div>
+</section>
+</div>
+<script>
+  document.querySelectorAll('.pv-switch button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.body.setAttribute('data-show', b.getAttribute('data-v'));
+      document.querySelectorAll('.pv-switch button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    });
+  });
+</script>
+</body>
+</html>
