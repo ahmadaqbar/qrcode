@@ -22,8 +22,8 @@ $topSellers = [];
 $promos = [];
 $detailProducts = [];   // data untuk modal detail produk (semua produk, termasuk yang tidak tersedia)
 try {
-    $flyer = db()->query('SELECT id, title, image, product_id FROM flyers WHERE ' . SQL_ACTIVE_PERIOD . ' ORDER BY id DESC LIMIT 1')->fetch() ?: null;
-    $promos = db()->query('SELECT id, title, image, product_id FROM promos WHERE ' . SQL_ACTIVE_PERIOD . ' ORDER BY sort_order ASC, id DESC LIMIT 10')->fetchAll();
+    $flyer = db()->query('SELECT * FROM flyers WHERE ' . SQL_ACTIVE_PERIOD . ' ORDER BY id DESC LIMIT 1')->fetch() ?: null;
+    $promos = db()->query('SELECT * FROM promos WHERE ' . SQL_ACTIVE_PERIOD . ' ORDER BY sort_order ASC, id DESC LIMIT 10')->fetchAll();
     $topSellers = db()->query('SELECT p.id, p.name, p.price, p.image FROM products p
                                JOIN categories c ON c.id = p.category_id AND c.is_active = 1
                                WHERE p.is_top_seller = 1 AND p.is_available = 1
@@ -40,6 +40,8 @@ try {
 }
 // Link promo/flyer hanya valid bila produknya ada di data detail (tidak pernah menghasilkan link rusak)
 $linkable = function ($pid) use ($detailProducts) { return $pid && isset($detailProducts[(int) $pid]) ? (int) $pid : 0; };
+// Link langsung (promo/flyer): divalidasi ulang saat tampil; dibuka di tab baru agar pesanan customer tidak hilang
+$directLink = function ($row) { return isset($row['link_url']) ? safe_link_url($row['link_url']) : null; };
 
 $page_title = 'Menu Meja ' . $table['table_number'];
 $base = '';
@@ -74,9 +76,11 @@ include __DIR__ . '/includes/header.php';
       <div class="carousel-inner">
         <?php foreach ($promos as $i => $pr): ?>
           <div class="carousel-item<?= $i === 0 ? ' active' : '' ?>">
-            <?php $lp = $linkable($pr['product_id']); ?>
+            <?php $lu = $directLink($pr); $lp = $lu === null ? $linkable($pr['product_id']) : 0; ?>
+            <?php if ($lu !== null): ?><a class="promo-link" href="<?= e($lu) ?>" target="_blank" rel="noopener noreferrer" aria-label="<?= e($pr['title']) ?> (buka tautan di tab baru)"><?php endif; ?>
             <img class="promo-img d-block w-100<?= $lp ? ' open-product' : '' ?>" alt="<?= e($pr['title']) ?>" src="<?= $base ?>assets/<?= e($pr['image']) ?>"
                  <?= $lp ? 'role="button" tabindex="0" data-open="' . $lp . '"' : '' ?>>
+            <?php if ($lu !== null): ?></a><?php endif; ?>
           </div>
         <?php endforeach; ?>
       </div>
@@ -158,15 +162,18 @@ include __DIR__ . '/includes/header.php';
 </a>
 
 <?php if ($flyer): ?>
-<?php $flyerProduct = $linkable($flyer['product_id']); ?>
+<?php $flyerLink = $directLink($flyer); $flyerProduct = $flyerLink === null ? $linkable($flyer['product_id']) : 0; ?>
 <div class="modal fade" id="flyer-modal" tabindex="-1" aria-labelledby="flyer-title" aria-hidden="true" data-flyer-id="<?= (int) $flyer['id'] ?>" data-product="<?= $flyerProduct ?>">
   <div class="modal-dialog modal-dialog-centered flyer-dialog">
     <div class="modal-content flyer-content">
       <button type="button" class="btn-close flyer-x" data-bs-dismiss="modal" aria-label="Tutup"></button>
       <div class="flyer-media">
+        <?php if ($flyerLink !== null): ?><a class="flyer-link" href="<?= e($flyerLink) ?>" target="_blank" rel="noopener noreferrer" aria-label="<?= e($flyer['title']) ?> (buka tautan di tab baru)"><?php endif; ?>
         <img class="flyer-img<?= $flyerProduct ? ' open-product' : '' ?>" src="<?= $base ?>assets/<?= e($flyer['image']) ?>" alt="<?= e($flyer['title']) ?>"
              <?= $flyerProduct ? 'role="button" tabindex="0"' : '' ?>>
-        <?php if ($flyerProduct): ?><span class="flyer-cta">Lihat menu <i class="bi bi-chevron-right" aria-hidden="true"></i></span><?php endif; ?>
+        <?php if ($flyerLink !== null): ?></a><?php endif; ?>
+        <?php if ($flyerProduct): ?><span class="flyer-cta">Lihat menu <i class="bi bi-chevron-right" aria-hidden="true"></i></span>
+        <?php elseif ($flyerLink !== null): ?><span class="flyer-cta">Buka tautan <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></span><?php endif; ?>
       </div>
       <div class="flyer-foot">
         <div id="flyer-title" class="fw-bold text-truncate"><?= e($flyer['title']) ?></div>

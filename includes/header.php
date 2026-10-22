@@ -14,6 +14,8 @@ $admin = !empty($admin);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e(isset($page_title) ? $page_title . ' - ' : '') . e(APP_NAME) ?></title>
+  <?= favicon_tags($base) ?>
+  <meta name="theme-color" content="#1E1611">
   <script>document.documentElement.className += " js";</script>
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="<?= $base ?>assets/vendor/bootstrap-icons/bootstrap-icons.min.css">

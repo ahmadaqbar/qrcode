@@ -429,3 +429,7 @@ body.qr-page, body.qr-page .admin-main, .qr-card { background: #fff; }
   .qr-card .text-muted { color: #000 !important; }
   .row > [class*="col-"] { flex: 0 0 33.333% !important; max-width: 33.333% !important; }
 }
+
+/* Promo/flyer dengan link langsung: seluruh gambar menjadi tautan */
+.promo-link, .flyer-link { display: block; color: inherit; }
+.dest-switch .btn { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }

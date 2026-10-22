@@ -217,6 +217,26 @@ function clean_input($v, int $max = 255): string
     return mb_substr($v, 0, $max, 'UTF-8');
 }
 
+/**
+ * Validasi link langsung untuk promo/flyer. Hanya http/https, tanpa spasi/kutip/kredensial, maks 500 karakter.
+ * Return URL bersih, atau null bila tidak valid. Dipakai saat simpan (admin) DAN saat tampil (customer).
+ */
+function safe_link_url($u): ?string
+{
+    if (!is_string($u)) {
+        return null;
+    }
+    $u = trim($u);
+    if ($u === '' || strlen($u) > 500 || preg_match('/[\s"\'<>\\\\\x00-\x1F]/', $u) || !preg_match('#^https?://#i', $u)) {
+        return null;
+    }
+    $parts = parse_url($u);
+    if (!$parts || empty($parts['host']) || isset($parts['user']) || isset($parts['pass']) || !filter_var($u, FILTER_VALIDATE_URL)) {
+        return null;
+    }
+    return $u;
+}
+
 /** Redirect + exit. */
 function redirect(string $url): void
 {
@@ -364,6 +384,33 @@ function theme_body_class(): string
     } catch (Throwable $ex) {
         return '';
     }
+}
+
+/**
+ * Ikon tab browser. Ganti dengan menaruh file di assets/images/theme/favicon.svg | favicon.png | favicon.ico
+ * (urutan prioritas itu). Tanpa file: pakai bawaan assets/images/q/favicon.svg.
+ */
+function favicon_tags(string $base): string
+{
+    $v = static function (string $rel): string {
+        $f = ROOT_PATH . '/assets/' . $rel;
+        return is_file($f) ? '?v=' . filemtime($f) : '';
+    };
+    $types = ['svg' => 'image/svg+xml', 'png' => 'image/png', 'ico' => 'image/x-icon'];
+    $rel = 'images/q/favicon.svg';
+    $type = $types['svg'];
+    foreach ($types as $ext => $mime) {
+        if (is_file(ROOT_PATH . '/assets/images/theme/favicon.' . $ext)) {
+            $rel = 'images/theme/favicon.' . $ext;
+            $type = $mime;
+            break;
+        }
+    }
+    $out = '<link rel="icon" type="' . $type . '" href="' . e($base) . 'assets/' . e($rel) . $v($rel) . '">';
+    if (is_file(ROOT_PATH . '/assets/images/theme/apple-touch-icon.png')) {
+        $out .= "\n  " . '<link rel="apple-touch-icon" href="' . e($base) . 'assets/images/theme/apple-touch-icon.png' . $v('images/theme/apple-touch-icon.png') . '">';
+    }
+    return $out;
 }
 
 /** Logo restoran opsional: taruh file assets/images/theme/logo.(svg|png|webp). Return path relatif assets/ atau null. */

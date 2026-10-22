@@ -47,3 +47,7 @@ Notifikasi suara: klik **AKTIFKAN** sekali saat membuka dashboard (aturan autopl
 
 ## Tema visual "Quiet Ethnic"
 Tampilan customer, staff/admin, login, dan QR memakai tema yang tenang: 90% bersih dan lega, 10% etnik (warna hangat, tipografi DM Serif Display + DM Sans, motif kecil hemat). Dua varian lewat satu CSS: Warm Minimal (default) dan Espresso Night (`settings.theme_variant = night`). Hanya mengubah tampilan — logika, database, dan URL tidak berubah. Detail palet, anggaran ornamen, aset opsional (logo), dan cara rollback: [docs/THEME.md](docs/THEME.md). Preview statis: `design-preview.html`.
+
+## Promo & flyer: tujuan produk atau link langsung
+Di `/admin/promos.php` dan `/admin/flyers.php` pilih **Tujuan saat gambar diketuk**: **Produk** (wajib memilih produk; membuka detail produk) atau **Link langsung** (wajib alamat `http://`/`https://`; dibuka di tab baru agar pesanan customer tidak hilang). Hanya satu tujuan per baris; server memvalidasi ulang (menolak `javascript:`, `ftp:`, spasi, kredensial di URL) dan customer pun memvalidasi lagi saat tampil. Butuh migrasi sekali jalan: `database/migrations/005_banner_direct_link.sql` (kolom `link_url`); tanpa migrasi, form tetap jalan dengan pilihan Produk saja dan menampilkan petunjuk.
+Ikon tab browser: lihat bagian "Ikon tab browser" di [docs/THEME.md](docs/THEME.md).

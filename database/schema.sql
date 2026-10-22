@@ -95,7 +95,8 @@ CREATE TABLE IF NOT EXISTS settings (
 CREATE TABLE IF NOT EXISTS flyers (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
-  product_id INT UNSIGNED NULL,              -- produk tujuan saat gambar diklik
+  product_id INT UNSIGNED NULL,              -- tujuan klik: produk ...
+  link_url VARCHAR(500) NULL,                -- ... ATAU link langsung (http/https); salah satu terisi
   image VARCHAR(255) NOT NULL,               -- relatif terhadap assets/, mis. uploads/flyers/xxx.jpg
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   start_date DATE NULL,
@@ -111,7 +112,8 @@ CREATE TABLE IF NOT EXISTS flyers (
 CREATE TABLE IF NOT EXISTS promos (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
-  product_id INT UNSIGNED NULL,              -- produk tujuan saat gambar diklik
+  product_id INT UNSIGNED NULL,              -- tujuan klik: produk ...
+  link_url VARCHAR(500) NULL,                -- ... ATAU link langsung (http/https); salah satu terisi
   image VARCHAR(255) NOT NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   start_date DATE NULL,

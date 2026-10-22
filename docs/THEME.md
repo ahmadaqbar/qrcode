@@ -75,6 +75,22 @@ Body 15 px, nama menu 16 px bold, harga 16 px bold terakota, deskripsi 13 px dib
 * **Foto menu** lewat admin Products (tanpa foto → placeholder netral hangat `assets/images/placeholder.svg`).
 * **Font lain** (mis. font brand): letakkan woff2 di `assets/fonts/`, tambahkan `@font-face` dan ganti `--q-font-head` / `--q-font-body`.
 
+## Ikon tab browser (favicon)
+
+Bawaan: `assets/images/q/favicon.svg` (lingkaran konsentris). Untuk menggantinya, **taruh file Anda di `assets/images/theme/`** dengan nama persis:
+
+| File | Keterangan |
+| --- | --- |
+| `favicon.svg` | Prioritas 1 (tajam di semua ukuran). |
+| `favicon.png` | Prioritas 2 (disarankan 64x64 atau 192x192, persegi). |
+| `favicon.ico` | Prioritas 3. |
+| `apple-touch-icon.png` | Opsional, ikon saat "Add to Home Screen" di iPhone (180x180). |
+
+Tidak perlu mengubah kode; berlaku untuk semua halaman (customer, login, admin). Tag dibuat oleh `favicon_tags()` di
+`includes/functions.php` dan dipasang di `includes/header.php`, dengan `?v=<waktu ubah file>` agar browser tidak memakai ikon lama.
+Bila ikon belum berubah, tutup tab lalu buka lagi atau tekan Ctrl+F5 (browser menyimpan favicon sangat agresif).
+Warna bar browser di HP: `<meta name="theme-color">` di `includes/header.php`.
+
 ## Rollback
 
 Tema berada di branch `feature/quiet-ethnic-theme` (satu commit per tahap).

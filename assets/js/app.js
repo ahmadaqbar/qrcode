@@ -668,6 +668,18 @@
       box.classList.remove('d-none');
     }
     sel.addEventListener('change', upd); upd();
+    /* Tujuan: Produk (wajib pilih produk) atau Link langsung (wajib URL). Server tetap memvalidasi. */
+    var rP = $('#dest-product'), rL = $('#dest-link'), li = $('#link_url');
+    if (rP && rL && li) {
+      var mode = function () {
+        var link = rL.checked;
+        $('#dest-product-box').classList.toggle('d-none', link);
+        $('#product-preview-box').classList.toggle('d-none', link);
+        $('#dest-link-box').classList.toggle('d-none', !link);
+        sel.required = !link; li.disabled = !link; li.required = link;
+      };
+      rP.addEventListener('change', mode); rL.addEventListener('change', mode); mode();
+    }
   }
 
   var inits = { 'banner-admin': initBannerAdmin, menu: initMenu, cart: initCart, checkout: initCheckout, success: initSuccess, 'order-detail': initOrderDetail, qr: initQr, dashboard: initDashboard };
