@@ -18,36 +18,39 @@ $page = 'checkout';
 $body_attrs = ['table' => $table['table_number']];
 include __DIR__ . '/includes/header.php';
 ?>
-<header class="cust-header sticky-top">
-  <div class="container">
-    <div class="cust-brand">
-      <a href="cart.php?table=<?= e($table['table_number']) ?>" class="btn btn-light btn-back" aria-label="Kembali">&larr;</a>
-      <div class="cust-name">Konfirmasi Pesanan</div>
-      <span class="stamp table-stamp">Meja <?= e($table['table_number']) ?></span>
-    </div>
+<header class="q-header">
+  <div class="q-wrap q-bar">
+    <a href="cart.php?table=<?= e($table['table_number']) ?>" class="q-back" aria-label="Kembali"><i class="bi bi-arrow-left" aria-hidden="true"></i></a>
+    <div class="q-name">Konfirmasi Pesanan</div>
+    <span class="q-table">Meja <?= e($table['table_number']) ?></span>
   </div>
 </header>
 
-<main class="container py-3 has-cartbar paper-panel">
-  <div class="card mb-3"><div class="card-body">
-    <div class="small text-muted">Meja</div>
-    <div class="fw-semibold fs-5"><?= e($table['table_number']) ?></div>
-    <div id="row-name" class="d-none mt-2"><div class="small text-muted">Nama</div><div id="c-name"></div></div>
-  </div></div>
+<main class="q-wrap q-main q-narrow has-cartbar">
+  <div class="q-card q-table-card">
+    <div class="q-table-big" aria-hidden="true"><?= e($table['table_number']) ?></div>
+    <div>
+      <div class="q-label-sm">Meja</div>
+      <div class="q-table-name">Meja <?= e($table['table_number']) ?></div>
+      <div id="row-name" class="d-none"><div class="q-label-sm mt-2">Nama</div><div id="c-name"></div></div>
+    </div>
+  </div>
 
-  <div class="card mb-3"><div class="card-body">
-    <div class="small text-muted mb-1">Pesanan</div>
-    <div id="c-items"></div>
-    <div id="row-note" class="d-none mt-3"><div class="small text-muted">Catatan</div><div id="c-note" class="text-break"></div></div>
-    <hr>
-    <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span id="c-total">Rp0</span></div>
-  </div></div>
+  <div class="q-card">
+    <div class="q-label-sm mb-2">Pesanan</div>
+    <div id="c-items" class="q-lines"></div>
+    <div id="row-note" class="d-none q-note-box"><div class="q-label-sm">Catatan untuk dapur</div><div id="c-note" class="text-break"></div></div>
+    <div class="q-sum-row q-sum-total"><span>Total</span><strong id="c-total">Rp 0</strong></div>
+    <?php if (($note = price_note_text()) !== ''): ?><p class="q-sum-note"><?= e($note) ?></p><?php endif; ?>
+  </div>
 
   <div id="c-error" class="alert alert-danger d-none"></div>
-  <?php if (($note = price_note_text()) !== ''): ?><p class="price-note"><?= e($note) ?></p><?php endif; ?>
 </main>
 
-<div class="cart-bar static-bar">
-  <button class="btn btn-light btn-lg w-100 fw-bold" id="btn-order">PESAN SEKARANG</button>
+<div class="q-actionbar">
+  <div class="q-wrap q-actions">
+    <a href="cart.php?table=<?= e($table['table_number']) ?>" class="btn btn-outline-dark">Kembali</a>
+    <button class="btn btn-accent flex-grow-1" id="btn-order">Kirim Pesanan</button>
+  </div>
 </div>
 <?php include __DIR__ . '/includes/footer.php'; ?>

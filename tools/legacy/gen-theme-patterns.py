@@ -6,7 +6,7 @@ Semua SVG seamless (elemen di tepi digandakan di sisi seberang) dan tanpa refere
 """
 import math, os, sys
 
-OUT = os.path.join(os.path.dirname(__file__), '..', 'assets', 'images', 'theme')
+OUT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets', 'images', 'legacy')
 INK, NAVY = '#14110F', '#0F1B2D'
 ORANGE, MUSTARD, TEAL, BLUE, CRIMSON, CREAM = '#E8861B', '#F2B33D', '#1E8A8F', '#1F4E8C', '#B5242F', '#F6EFE2'
 

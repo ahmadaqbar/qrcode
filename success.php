@@ -25,19 +25,26 @@ $page = 'success';
 $body_attrs = ['table' => $order['table_number'], 'token' => $token, 'status' => $order['status']];
 include __DIR__ . '/includes/header.php';
 ?>
-<main class="container py-5 text-center paper-panel panel-lone" style="max-width:480px">
-  <img class="success-orn mb-2" src="assets/images/theme/ornament-success.svg" width="110" height="110" alt="">
-  <h1 class="h3 fw-bold">PESANAN BERHASIL</h1>
-  <p class="text-muted">Pesanan Anda telah diterima.</p>
-  <div class="card text-start mt-4"><div class="card-body">
-    <div class="small text-muted">Nomor Pesanan</div>
-    <div class="fs-4 fw-bold mb-2"><?= e($order['order_number']) ?></div>
-    <div class="small text-muted">Meja</div>
-    <div class="fw-semibold mb-2"><?= e($order['table_number']) ?></div>
-    <div class="small text-muted">Status</div>
-    <span class="status-badge" id="order-status" data-status="<?= e($order['status']) ?>"><?= e(status_label($order['status'])) ?></span>
-  </div></div>
-  <p class="mt-4" id="wait-msg">Mohon menunggu.</p>
-  <a href="order.php?table=<?= e($order['table_number']) ?>" class="btn btn-outline-dark mt-2">Pesan Lagi</a>
+<main class="q-wrap q-main q-narrow q-success">
+  <?= q_mark_svg(true) ?>
+  <h1 class="q-title">Pesanan Berhasil</h1>
+  <p class="q-muted">Pesanan Anda telah diterima.</p>
+
+  <ol class="q-steps" id="order-steps" data-status="<?= e($order['status']) ?>" aria-label="Status pesanan">
+    <li data-step="1"><span class="q-dot"></span><span class="q-step-label">Diterima</span></li>
+    <li data-step="2"><span class="q-dot"></span><span class="q-step-label">Diproses</span></li>
+    <li data-step="3"><span class="q-dot"></span><span class="q-step-label">Selesai</span></li>
+  </ol>
+  <p class="q-wait" id="wait-msg">Mohon menunggu.</p>
+
+  <div class="q-card q-order-card text-start">
+    <div class="q-label-sm">Nomor Pesanan</div>
+    <div class="q-order-no"><?= e($order['order_number']) ?></div>
+    <div class="q-order-meta">
+      <div><div class="q-label-sm">Meja</div><div class="fw-semibold"><?= e($order['table_number']) ?></div></div>
+      <div><div class="q-label-sm">Status</div><span class="status-badge" id="order-status" data-status="<?= e($order['status']) ?>"><?= e(status_label($order['status'])) ?></span></div>
+    </div>
+  </div>
+  <a href="order.php?table=<?= e($order['table_number']) ?>" class="btn btn-outline-dark">Pesan Lagi</a>
 </main>
 <?php include __DIR__ . '/includes/footer.php'; ?>

@@ -10,6 +10,12 @@ require_login();
 
 $pdo = db();
 $T = $cfg['table'];
+// Kolom link_url dibuat oleh migrasi 005; tanpa migrasi, form tetap berfungsi hanya dengan pilihan Produk.
+try {
+    $hasLink = (bool) $pdo->query("SHOW COLUMNS FROM $T LIKE 'link_url'")->fetchColumn();
+} catch (Throwable $ex) {
+    $hasLink = false;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_valid()) {
@@ -28,15 +34,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($title === '') {
                 throw new RuntimeException('Judul wajib diisi.');
             }
-            // product_id dari client TIDAK dipercaya: harus angka dan benar-benar ada di tabel products
-            $pid = filter_var(isset($_POST['product_id']) ? $_POST['product_id'] : null, FILTER_VALIDATE_INT);
-            if (!$pid || $pid < 1) {
-                throw new RuntimeException('Produk wajib dipilih.');
-            }
-            $pchk = $pdo->prepare('SELECT COUNT(*) FROM products WHERE id = ?');
-            $pchk->execute([$pid]);
-            if (!$pchk->fetchColumn()) {
-                throw new RuntimeException('Produk yang dipilih tidak ditemukan.');
+            // Tujuan klik: SALAH SATU produk (wajib dipilih) atau link langsung. Input client tidak dipercaya.
+            $dest = $hasLink && isset($_POST['dest']) && $_POST['dest'] === 'link' ? 'link' : 'product';
+            $pid = null;
+            $url = null;
+            if ($dest === 'link') {
+                $url = safe_link_url(clean_input(isset($_POST['link_url']) ? $_POST['link_url'] : '', 500));
+                if ($url === null) {
+                    throw new RuntimeException('Link langsung wajib diisi dengan alamat http:// atau https:// yang valid (tanpa spasi, maks 500 karakter).');
+                }
+            } else {
+                $pid = filter_var(isset($_POST['product_id']) ? $_POST['product_id'] : null, FILTER_VALIDATE_INT);
+                if (!$pid || $pid < 1) {
+                    throw new RuntimeException('Produk wajib dipilih (atau pilih tujuan Link langsung).');
+                }
+                $pchk = $pdo->prepare('SELECT COUNT(*) FROM products WHERE id = ?');
+                $pchk->execute([$pid]);
+                if (!$pchk->fetchColumn()) {
+                    throw new RuntimeException('Produk yang dipilih tidak ditemukan.');
+                }
             }
             if ($start === false || $end === false) {
                 throw new RuntimeException('Format tanggal tidak valid.');
@@ -64,12 +80,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('Gambar wajib diunggah.');
             }
             $cols = $cfg['sort'] ? ', sort_order = ?' : '';
+            $lcol = $hasLink ? ', link_url = ?' : '';
             if ($id) {
-                $params = [$title, $pid, $active, $start, $end];
+                $params = [$title, $pid];
+                if ($hasLink) { $params[] = $url; }
+                array_push($params, $active, $start, $end);
                 if ($cfg['sort']) { $params[] = $sort; }
                 $params[] = $img;
                 $params[] = $id;
-                $pdo->prepare("UPDATE $T SET title = ?, product_id = ?, is_active = ?, start_date = ?, end_date = ?$cols, image = COALESCE(?, image) WHERE id = ?")
+                $pdo->prepare("UPDATE $T SET title = ?, product_id = ?$lcol, is_active = ?, start_date = ?, end_date = ?$cols, image = COALESCE(?, image) WHERE id = ?")
                     ->execute($params);
                 if ($img) {
                     delete_upload_image($old);
@@ -77,9 +96,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $icols = $cfg['sort'] ? ', sort_order' : '';
                 $iq = $cfg['sort'] ? ', ?' : '';
-                $params = [$title, $pid, $img, $active, $start, $end];
+                $params = [$title, $pid];
+                if ($hasLink) { $params[] = $url; }
+                array_push($params, $img, $active, $start, $end);
                 if ($cfg['sort']) { $params[] = $sort; }
-                $pdo->prepare("INSERT INTO $T (title, product_id, image, is_active, start_date, end_date$icols) VALUES (?, ?, ?, ?, ?, ?$iq)")->execute($params);
+                $lins = $hasLink ? ', link_url' : '';
+                $lq = $hasLink ? ', ?' : '';
+                $pdo->prepare("INSERT INTO $T (title, product_id$lins, image, is_active, start_date, end_date$icols) VALUES (?, ?$lq, ?, ?, ?, ?$iq)")->execute($params);
             }
             flash_set('ok', $cfg['title'] . ' disimpan.');
         } elseif ($action === 'toggle' && $id) {
@@ -132,8 +155,20 @@ include __DIR__ . '/header.php';
         <input class="form-control" name="title" maxlength="100" required value="<?= e($edit ? $edit['title'] : '') ?>"></div>
       <div class="col-12 col-md-6"><label class="form-label small">Gambar (JPG/PNG/WebP, maks 2MB; <?= e($cfg['ratio_hint']) ?>)<?= $edit ? ' - kosongkan bila tidak diganti' : '' ?></label>
         <input class="form-control" type="file" name="image" accept="image/jpeg,image/png,image/webp" <?= $edit ? '' : 'required' ?>></div>
-      <div class="col-12 col-lg-6"><label class="form-label small" for="product_id">Produk tujuan (wajib)</label>
-        <select class="form-select" name="product_id" id="product_id" required>
+      <?php $editLink = $edit && $hasLink && !empty($edit['link_url']); ?>
+      <div class="col-12">
+        <div class="form-label small mb-1" id="dest-label">Tujuan saat gambar diketuk</div>
+        <?php if ($hasLink): ?>
+        <div class="btn-group dest-switch" role="group" aria-labelledby="dest-label">
+          <input type="radio" class="btn-check" name="dest" id="dest-product" value="product" autocomplete="off" <?= $editLink ? '' : 'checked' ?>>
+          <label class="btn btn-outline-dark btn-sm" for="dest-product"><i class="bi bi-box-seam" aria-hidden="true"></i> Produk</label>
+          <input type="radio" class="btn-check" name="dest" id="dest-link" value="link" autocomplete="off" <?= $editLink ? 'checked' : '' ?>>
+          <label class="btn btn-outline-dark btn-sm" for="dest-link"><i class="bi bi-link-45deg" aria-hidden="true"></i> Link langsung</label>
+        </div>
+        <?php endif; ?>
+      </div>
+      <div class="col-12 col-lg-6" id="dest-product-box"><label class="form-label small" for="product_id">Produk tujuan (wajib)</label>
+        <select class="form-select" name="product_id" id="product_id" <?= $editLink ? '' : 'required' ?>>
           <option value="">&mdash; Pilih produk &mdash;</option>
           <?php foreach ($products as $p): ?>
             <option value="<?= (int) $p['id'] ?>" data-name="<?= e($p['name']) ?>" data-price="<?= e(rupiah($p['price'])) ?>"
@@ -142,13 +177,20 @@ include __DIR__ . '/header.php';
           <?php endforeach; ?>
         </select>
         <div class="form-text">Customer yang mengetuk gambar akan diarahkan ke detail produk ini.</div></div>
-      <div class="col-12 col-lg-6">
+      <div class="col-12 col-lg-6" id="product-preview-box">
         <div id="product-preview" class="product-preview d-none" aria-live="polite">
           <img id="pp-img" alt="" width="64" height="64">
           <div class="min-w-0"><div class="fw-semibold text-truncate" id="pp-name"></div>
             <div class="small" id="pp-price"></div><span class="badge" id="pp-status"></span></div>
         </div>
       </div>
+      <?php if ($hasLink): ?>
+      <div class="col-12 <?= $editLink ? '' : 'd-none' ?>" id="dest-link-box"><label class="form-label small" for="link_url">Link langsung (wajib)</label>
+        <input class="form-control" type="url" name="link_url" id="link_url" maxlength="500" inputmode="url" placeholder="https://contoh.com/halaman" value="<?= e($editLink ? $edit['link_url'] : '') ?>" <?= $editLink ? 'required' : 'disabled' ?>>
+        <div class="form-text">Hanya alamat <code>http://</code> atau <code>https://</code>. Dibuka di tab baru supaya pesanan customer tidak hilang.</div></div>
+      <?php else: ?>
+      <div class="col-12"><div class="alert alert-warning py-2 small mb-0">Pilihan <strong>Link langsung</strong> belum aktif: jalankan migrasi <code>database/migrations/005_banner_direct_link.sql</code> sekali.</div></div>
+      <?php endif; ?>
       <div class="col-6 col-md-3"><label class="form-label small">Mulai</label>
         <input class="form-control" type="date" name="start_date" value="<?= e($edit ? $edit['start_date'] : '') ?>"></div>
       <div class="col-6 col-md-3"><label class="form-label small">Selesai</label>
@@ -170,14 +212,16 @@ include __DIR__ . '/header.php';
 
   <div class="table-responsive">
     <table class="table table-hover align-middle bg-white banner-table">
-      <thead><tr><th>Image</th><th>Title</th><th>Product</th><th class="text-end">Price</th><th>Status</th><th>Period</th><?php if ($cfg['sort']): ?><th class="text-center">Order</th><?php endif; ?><th class="text-end">Action</th></tr></thead>
+      <thead><tr><th>Image</th><th>Title</th><th>Destination</th><th class="text-end">Price</th><th>Status</th><th>Period</th><?php if ($cfg['sort']): ?><th class="text-center">Order</th><?php endif; ?><th class="text-end">Action</th></tr></thead>
       <tbody>
       <?php foreach ($rows as $r): list($label, $cls) = period_status($r); ?>
         <tr>
           <td><img class="banner-thumb-sm" alt="" src="../assets/<?= e($r['image']) ?>"></td>
           <td class="fw-semibold text-break"><?= e($r['title']) ?></td>
-          <td><?php if ($r['p_name'] !== null): ?><?= e($r['p_name']) ?><?= $r['p_avail'] ? '' : ' <span class="badge text-bg-secondary">Habis</span>' ?>
-              <?php else: ?><span class="text-danger small">Belum dikaitkan &mdash; edit &amp; pilih produk</span><?php endif; ?></td>
+          <?php $rowLink = $hasLink && !empty($r['link_url']) ? safe_link_url($r['link_url']) : null; ?>
+          <td><?php if ($rowLink !== null): ?><span class="badge text-bg-info me-1">Link</span><a class="text-break small" href="<?= e($rowLink) ?>" target="_blank" rel="noopener noreferrer"><?= e((string) parse_url($rowLink, PHP_URL_HOST)) ?></a>
+              <?php elseif ($r['p_name'] !== null): ?><?= e($r['p_name']) ?><?= $r['p_avail'] ? '' : ' <span class="badge text-bg-secondary">Habis</span>' ?>
+              <?php else: ?><span class="text-danger small">Belum ada tujuan &mdash; edit &amp; pilih produk atau link</span><?php endif; ?></td>
           <td class="text-end text-nowrap"><?= $r['p_price'] !== null ? e(rupiah($r['p_price'])) : '-' ?></td>
           <td><span class="badge text-bg-<?= e($cls) ?>"><?= e(strtoupper($label)) ?></span></td>
           <td class="small text-nowrap"><?= e(date_id($r['start_date'])) ?><br><?= e(date_id($r['end_date'])) ?></td>

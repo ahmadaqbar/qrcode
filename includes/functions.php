@@ -51,7 +51,7 @@ function e($value): string
 
 function rupiah($n): string
 {
-    return 'Rp' . number_format((int) $n, 0, ',', '.');
+    return 'Rp ' . number_format((int) $n, 0, ',', '.');
 }
 
 function status_label(string $status): string
@@ -76,8 +76,8 @@ function fail_page(string $message, int $code = 400): void
     $page_title = 'Terjadi Kesalahan';
     $base = '';
     include ROOT_PATH . '/includes/header.php';
-    echo '<div class="container py-5 text-center paper-panel panel-lone" style="max-width:480px"><h1 class="h4 mb-2">' . e($message) . '</h1><div class="ornament-rule" role="presentation"></div>'
-       . '<p class="text-muted">Silakan scan ulang QR Code di meja Anda.</p></div>';
+    echo '<main class="q-wrap q-empty"><div class="q-empty-card">' . q_mark_svg() . '<h1 class="q-title">' . e($message) . '</h1>'
+       . '<p class="q-muted">Silakan scan ulang QR Code di meja Anda.</p></div></main>';
     include ROOT_PATH . '/includes/footer.php';
     exit;
 }
@@ -217,6 +217,26 @@ function clean_input($v, int $max = 255): string
     return mb_substr($v, 0, $max, 'UTF-8');
 }
 
+/**
+ * Validasi link langsung untuk promo/flyer. Hanya http/https, tanpa spasi/kutip/kredensial, maks 500 karakter.
+ * Return URL bersih, atau null bila tidak valid. Dipakai saat simpan (admin) DAN saat tampil (customer).
+ */
+function safe_link_url($u): ?string
+{
+    if (!is_string($u)) {
+        return null;
+    }
+    $u = trim($u);
+    if ($u === '' || strlen($u) > 500 || preg_match('/[\s"\'<>\\\\\x00-\x1F]/', $u) || !preg_match('#^https?://#i', $u)) {
+        return null;
+    }
+    $parts = parse_url($u);
+    if (!$parts || empty($parts['host']) || isset($parts['user']) || isset($parts['pass']) || !filter_var($u, FILTER_VALIDATE_URL)) {
+        return null;
+    }
+    return $u;
+}
+
 /** Redirect + exit. */
 function redirect(string $url): void
 {
@@ -321,7 +341,7 @@ function period_status(array $r): array
 function category_icon_html($icon, string $base = '', string $cls = ''): string
 {
     if (is_string($icon) && preg_match('#^uploads/categories/[a-f0-9]{16}\.(png|ico)$#', $icon)) {
-        return '<img class="cat-ico ' . e($cls) . '" src="' . e($base) . 'assets/' . e($icon) . '" alt="" width="20" height="20" loading="lazy">';
+        return '<img class="cat-ico ' . e($cls) . '" src="' . e($base) . 'assets/' . e($icon) . '" alt="" width="20" height="20">';
     }
     $bi = is_string($icon) && preg_match('/^bi-[a-z0-9-]{2,40}$/', $icon) ? $icon : 'bi-grid';
     return '<i class="bi ' . e($bi) . ' ' . e($cls) . '" aria-hidden="true"></i>';
@@ -329,20 +349,19 @@ function category_icon_html($icon, string $base = '', string $cls = ''): string
 
 /* ---------- Tema (tampilan saja) ---------- */
 
-/**
- * Harga ringkas ala menu cetak: 17500 -> "17,5 K", 25000 -> "25 K". Di bawah 1.000 tetap Rupiah penuh.
- * HANYA tampilan; nilai harga di DB/server tidak berubah. Teks Rupiah lengkap disertakan untuk pembaca layar.
- */
-function price_short_html($n): string
+/** Ikon lingkaran konsentris kecil (motif etnik) untuk halaman kosong/error/sukses. $check = tambahkan tanda centang. */
+function q_mark_svg(bool $check = false): string
 {
-    $n = (int) $n;
-    $full = rupiah($n);
-    if ($n < 1000) {
-        return '<span class="price-short">' . e($full) . '</span>';
+    $svg = '<svg class="q-mark" width="88" height="88" viewBox="0 0 88 88" aria-hidden="true" focusable="false">'
+         . '<circle cx="44" cy="44" r="42" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>'
+         . '<circle cx="44" cy="44" r="34" fill="var(--q-accent)" fill-opacity=".35"/>'
+         . '<circle cx="44" cy="44" r="25" fill="var(--q-surface)" stroke="var(--q-primary-bright)" stroke-width="3"/>';
+    if ($check) {
+        $svg .= '<path d="M33 45l8 8 15-17" fill="none" stroke="var(--q-teal)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
+    } else {
+        $svg .= '<circle cx="44" cy="44" r="9" fill="var(--q-primary-bright)"/>';
     }
-    $k = rtrim(rtrim(number_format($n / 1000, 3, ',', ''), '0'), ',');
-    return '<span class="price-short"><span class="visually-hidden">' . e($full) . '</span><span aria-hidden="true">'
-         . e($k) . '<b>K</b></span></span>';
+    return $svg . '</svg>';
 }
 
 /** Catatan harga di halaman menu & pesanan. Ubah lewat tabel settings (key: price_note); nilai kosong = disembunyikan. */
@@ -355,6 +374,43 @@ function price_note_text(): string
     } catch (Throwable $ex) {
         return $default;
     }
+}
+
+/** Varian tampilan customer: settings.theme_variant = 'night' -> body.theme-night (Espresso Night). Default: Warm Minimal. */
+function theme_body_class(): string
+{
+    try {
+        return get_setting('theme_variant', '') === 'night' ? 'theme-night' : '';
+    } catch (Throwable $ex) {
+        return '';
+    }
+}
+
+/**
+ * Ikon tab browser. Ganti dengan menaruh file di assets/images/theme/favicon.svg | favicon.png | favicon.ico
+ * (urutan prioritas itu). Tanpa file: pakai bawaan assets/images/q/favicon.svg.
+ */
+function favicon_tags(string $base): string
+{
+    $v = static function (string $rel): string {
+        $f = ROOT_PATH . '/assets/' . $rel;
+        return is_file($f) ? '?v=' . filemtime($f) : '';
+    };
+    $types = ['svg' => 'image/svg+xml', 'png' => 'image/png', 'ico' => 'image/x-icon'];
+    $rel = 'images/q/favicon.svg';
+    $type = $types['svg'];
+    foreach ($types as $ext => $mime) {
+        if (is_file(ROOT_PATH . '/assets/images/theme/favicon.' . $ext)) {
+            $rel = 'images/theme/favicon.' . $ext;
+            $type = $mime;
+            break;
+        }
+    }
+    $out = '<link rel="icon" type="' . $type . '" href="' . e($base) . 'assets/' . e($rel) . $v($rel) . '">';
+    if (is_file(ROOT_PATH . '/assets/images/theme/apple-touch-icon.png')) {
+        $out .= "\n  " . '<link rel="apple-touch-icon" href="' . e($base) . 'assets/images/theme/apple-touch-icon.png' . $v('images/theme/apple-touch-icon.png') . '">';
+    }
+    return $out;
 }
 
 /** Logo restoran opsional: taruh file assets/images/theme/logo.(svg|png|webp). Return path relatif assets/ atau null. */
